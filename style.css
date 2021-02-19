@@ -1,0 +1,101 @@
+* {
+    box-sizing: border-box;
+}
+
+
+/* Basic HTML elements */
+body {
+    background: #222222;
+    color: antiquewhite;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+h1 {
+    font-size: 48px;
+}
+
+a {
+    text-decoration: none;
+}
+
+
+
+
+/* Area DIVs */
+.area {
+    display: flex;
+    border: 1px cyan solid;
+    height: 80vh;
+    margin: 25px;
+}
+
+.flex-container {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.flex-row {
+    flex-direction: row;
+     flex-wrap: wrap;
+}
+
+.flex-column {
+    flex-direction: column;
+    flex-wrap: wrap;
+}
+
+.flex-child {
+    flex: 1;
+    height: auto;
+}
+
+/* .flex-child:before {
+    content: '';
+    display: block;
+    padding-top: 100%;
+} */
+
+#play-area {
+    flex: 2;
+}
+
+
+#held-area {
+    flex: 1;
+    border: 4px solid orange;
+}
+
+
+/* Dice DIVS */
+.die {
+    display: block;
+    height: 100px;
+    width: 100px; 
+    border: solid 1px red;
+    text-align: center;
+    justify-content: center;
+    margin: 20px;
+}
+
+.die:hover {
+    border: white solid 1px;
+}
+
+
+/* Buttons  */
+
+a.button {
+    display: block;
+    width: 150px;
+    height: 75px;
+    border: 1px chartreuse solid;
+    text-align: center;
+    text-decoration: none;
+    color: white;
+    
+}
+
+a.button:hover {
+    border: 1px red solid;
+    background: #333333;
+}
