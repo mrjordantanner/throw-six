@@ -47,11 +47,13 @@ class Game {
     // if END TURN, end of turn with Z points earned
 
         throw(num) {
+            dice.length = 0;
             // Create num dice in play area
             console.log(`Throwing ${num} dice`);
             for (let i = 1; i <= num; i++) {
                 const newDie = new Die();
                 dice.push(newDie);
+                diceInPlay.push(newDie);
                 playArea.appendChild(newDie.div);
             }
         }
@@ -76,6 +78,8 @@ class Game {
 
 const game = new Game();
 const dice = [];
+const diceInPlay = [];
+const diceInHeld = [];
 const playArea = document.querySelector('#play-area');
 const heldArea = document.querySelector('#held-area');
 const buttonRoll = document.querySelector('#button-roll');
@@ -106,14 +110,16 @@ buttonRoll.addEventListener('click', (e) => {
 
    // console.clear();
 
-    const numberOfDice = playArea.querySelectorAll('.die').length;
+    //const numberOfDice = playArea.querySelectorAll('.die').length;
+    const numberOfDice = diceInPlay.length;
     console.log(`Dice in playArea: ${numberOfDice}`)
 
+    // Clear dice from array and board
+    diceInPlay.forEach((die) => {
+			if (diceInPlay.length > 0) die.div.remove();
+		});
 
-    diceInPlay().forEach((die) => {
-        if (diceInPlay().length > 0)
-            die.div.remove();
-    })
+    diceInPlay.length = 0;
 
     // const notHeld = dice.filter((die) => die.held === false);
     // //console.log(`dice: ${dice.length}`);
@@ -126,7 +132,7 @@ buttonRoll.addEventListener('click', (e) => {
 
 
     // If board is empty, throw 6 die, otherwise throw remaining die already on board
-    if (numberOfDice === 0 && diceInHeld().length === 0) {
+    if (numberOfDice === 0 && diceInHeld.length === 0) {
         game.throw(6);
     }
     else {
@@ -143,6 +149,7 @@ buttonRoll.addEventListener('click', (e) => {
 
     //console.log(``)
 
+    //console.log(`Ones in play? ${anyInPlay(1)}`);
 
 
 
@@ -170,6 +177,11 @@ function moveDie(div) {
         die.held = true;
         die.updateUI();
 
+        // remove from diceInPlay array 
+        const index = diceInPlay.indexOf(die);
+        diceInPlay.splice(index, 1);
+        // put in diceInHeld array
+        diceInHeld.push(die);
     }
     // Moving dice out of held area
     // else
@@ -194,123 +206,124 @@ function moveDie(div) {
 // Checks the dice in the playing area for dice that are worth points
 function checkScoring() {
 
-    const diceToCheck = diceInPlay();
-        const ones = [];
-            const twos = [];
-                const threes = [];
-                    const fours = [];
-                        const fives = [];
-                            const sixes = [];
+	// Make an object of arrays to hold our dice sorted by their rolled values
+	const sorted = {
+		ones: [],
+		twos: [],
+		threes: [],
+		fours: [],
+		fives: [],
+		sixes: [],
+	};
 
-    console.log(`Checking dice in play: ${diceToCheck.length}`);
+	console.log(`Checking dice in play: ${diceInPlay.length}`);
 
-    diceToCheck.forEach((die) => {
+	diceInPlay.forEach((die) => {
+		//console.log(die);
 
-        //console.log(die);
+		// SORT
+		// take inventory of how many of each number there are
+		switch (die.value) {
+			case 1:
+				sorted.ones.push(die);
+				break;
 
-        // SORT
-        // take inventory of how many of each number there are
-        switch (die.value) {
+			case 2:
+				sorted.twos.push(die);
+				break;
 
-					case 1:
-						ones.push(die);
-						break;
+			case 3:
+				sorted.threes.push(die);
+				break;
+			case 4:
+				sorted.fours.push(die);
+				break;
 
-					case 2:
-                        twos.push(die);
-						break;
+			case 5:
+				sorted.fives.push(die);
+				break;
 
-					case 3:
-                        threes.push(die);
-						break;
-					case 4:
-                        fours.push(die);
-						break;
+			case 6:
+				sorted.sixes.push(die);
+				break;
+		}
+	});
 
-					case 5:
-                        fives.push(die);
-						break;
+	// PROCESS
 
-					case 6:
-                        sixes.push(die);
-						break;
-    
-				}
+	// are there any 1's and 5's?
+	// if so, die.scoring = true;
+	// add styling class to dice to indicate they are scoring dice
 
-        // PROCESS
+	// Check for single 1's 
+	if (sorted.ones.length > 0 && sorted.ones.length < 3) {
+		sorted.ones.forEach((die) => {
+			die.scoring = true;
+			die.div.classList.add('scoring');
+		});
+	}
+    // Check for single 5's
+	if (sorted.fives.length > 0 && sorted.fives.length < 3) {
+		sorted.fives.forEach((die) => {
+			die.scoring = true;
+			die.div.classList.add('scoring');
+		});
+	}
 
-        // are there any 1's and 5's?
-            // if so, die.scoring = true;
-            // add styling class to dice to indicate they are scoring dice
+	// Iterate through sorted object's properties (the sorted arrays)
+	Object.entries(sorted).forEach((entry) => {
+		console.log(entry);
+		if (entry[1].length >= 3) {
+			entry[1].forEach((die) => {
+				die.scoring = true;
+				die.div.classList.add('scoring-group');
+				// scoringGroup.push(die);
+			});
+            console.log(`Rolled ${entry[1].length} ${entry[0]}!`);
+		}
+	});
 
-
-        if (ones.length > 0) {
-            ones.forEach((die) => {
-
-                die.scoring = true;
-                die.div.classList.add('scoring');
-                die.updateUI();
-
-            })
-        }
-
-
-        // are there any three's of a kind (not of 1's and 5's)?
-            // if so, die.scoring = true;
-            // const scoringGroup = [];
-            // scoringGroup.push(each die);
-
-
-
-    })
-
-
-        // console.log(`Ones: ${ones.length}`);
-        // console.log(`Twos: ${twos.length}`);
-        // console.log(`Threes: ${threes.length}`);
-        // console.log(`Fours: ${fours.length}`);
-        // console.log(`Fives: ${fives.length}`);
-        // console.log(`Sixes: ${sixes.length}`);
-
-
-
+	updateDiceUI();
 
 
+    // how will "scoring groups" work?  i.e How will the grouping of similar dice work? 
+        // 1) Have a scoringGroup property on each dice object that we set, and compare with e.g. 'A' or 'B' etc
+        // 2) DESIGNATE the existing array as a scoring group 
+            // e.g. this group of three 4's 
+
+
+
+	// are there any three's of a kind (not of 1's and 5's)?
+	// if so, die.scoring = true;
+	// const scoringGroup = [];
+	// scoringGroup.push(each die);
+
+	// At the end of processing, if there are no dice.scoring = true, end turn and lose points
+
+	// Print
+	// console.log(`Ones: ${ones.length}`);
+	// console.log(`Twos: ${twos.length}`);
+	// console.log(`Threes: ${threes.length}`);
+	// console.log(`Fours: ${fours.length}`);
+	// console.log(`Fives: ${fives.length}`);
+	// console.log(`Sixes: ${sixes.length}`);
 }
 
 
+function updateDiceUI() {
+    dice.forEach((die) => {
+        die.updateUI();
+    })
+}
 
 function checkParent(parent, child) {
 	if (parent.contains(child)) return true;
 	return false;
 } 
 
+function anyInPlay(value) {
 
-
-// TODO:  Use filter instead
-function diceInPlay() {
-	const returnDice = [];
-
-	dice.forEach((die) => {
-		if (!die.held) {
-			returnDice.push(die);
-			//console.log(`${die.value} is in play`);
-		}
-	});
-	return returnDice;
-	//return playArea.querySelectorAll('.die');
-
-}
-
-function diceInHeld() {
-    const returnDice = [];
-
-    dice.forEach((die) => {
-        if (die.held) {
-            returnDice.push(die);
-            console.log(`${die.value} is in held`);
-        }
-    });
-    return returnDice;
-	//return playArea.querySelectorAll('.die');
+    const test = (die) => die.value === value;
+    return diceInPlay.some(test);
+    
 }
