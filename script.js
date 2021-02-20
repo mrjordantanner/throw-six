@@ -58,7 +58,9 @@ class Game {
                 playArea.appendChild(newDie.div);
             }
 
-            console.log(`Dice: ${dice}`);
+
+            console.log(anyScoring());
+           // console.log(`Dice: ${dice}`);
         }
 }
 //#endregion
@@ -69,10 +71,19 @@ class Game {
 // INITIALIZATION & SETUP
 //#region [Blue]
 
+// Objects and arrays
 const game = new Game();
 const dice = [];
 const diceInPlay = [];
 const diceInHeld = [];
+
+// Global variables
+playerRoundScore = 0;
+playerTotalScore = 0;
+computerRoundScore = 0;
+computerTotalScorre = 0;
+
+// Elements
 const playArea = document.querySelector('#play-area');
 const heldArea = document.querySelector('#held-area');
 const buttonRoll = document.querySelector('#button-roll');
@@ -94,13 +105,16 @@ playArea.addEventListener('click', (e) => {
         // If not in a scoring group, move by itself
         if (targetDie.group.length === 0) {
             moveDie(e.target);
+            calculateSoloValue(targetDie);
         }
         else {   // move all dice in the group
             const all = allInGroup(targetDie.group);
             //console.log(all);
             all.forEach((die) => {
                 moveDie(die.div);
+
             })
+            calculateGroupValue(all);
         }
 
         console.log(`In Play: ${diceInPlay.length}`);
@@ -268,9 +282,11 @@ function checkScoring() {
                 if (die.group === '') {
 				    die.group = 'A';
                 }
-                else{
-                    throw console.error(`${die} already a member of a scoring group`);
+                // for the rare occasion that a player rolled two separate groups at once
+                else if (die.group === 'A') {    
+                    die.group = 'B';
                 }
+                   
                 
 			});
             console.log(`Rolled ${entry[1].length} ${entry[0]}!`);
@@ -279,17 +295,11 @@ function checkScoring() {
 
 	updateDiceUI();
 
-    // how will "scoring groups" work?  i.e How will the grouping of similar dice work? 
-        // 1) Have a scoringGroup property on each dice object that we set, and compare with e.g. 'A' or 'B' etc
-        // 2) DESIGNATE the existing array as a scoring group 
-            // e.g. this group of three 4's 
-
-
-	// are there any three's of a kind (not of 1's and 5's)?
-	// if so, die.scoring = true;
-	// const scoringGroup = [];
-	// scoringGroup.push(each die);
-
+    if (!anyScoring()) {
+        console.log("NO SCORING DICE. END OF ROUND")
+        playerRoundScore = 0;
+        buttonRoll.classList.add('disabled');
+    }
 	// At the end of processing, if there are no dice.scoring = true, end turn and lose points
 
 	// Print
@@ -321,7 +331,53 @@ function anyInPlay(value) {
     
 }
 
+
+
+function anyScoring() {
+    let found = false;
+    diceInPlay.forEach((die) => {
+        if (die.scoring === true || die.scoring === 'true') {
+            found = true;
+        }
+    })
+    return found;
+    // const test = (die) => die.scoring === 'true';
+    // return diceInPlay.some(test);
+    
+}
+
 function allInGroup(group) {
     const test = (die) => die.group === group;
 	return diceInPlay.filter(test);
 }
+
+// Determines the value of a single die as it is being held and adds it to roundTotal
+function calculateSoloValue(die) {
+
+    if (die.value === 1) {
+        return 100;
+    }
+
+    if (die.value === 5) {
+        return 50;
+    }
+
+}
+
+
+function calculateGroupValue(dice) {
+
+
+
+
+}
+
+
+
+// three of a kind is worth 100 points multiplied by the given number, e.g. three 4s are worth 400 points;
+// three 1's are worth 1,000 points;
+// four or more of a kind is worth double the points of three of a kind, so four 4s are worth 800 points, five 4s are worth 1,600 points etc.
+
+// full straight 1-6 is worth 1500 points.
+// partial straight 1-5 is worth 500 points.
+// partial straight 2-6 is worth 750 points.
