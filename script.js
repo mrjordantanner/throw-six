@@ -3,19 +3,19 @@
 // Creates Die objects for use in play
 class Die {
 
-    constructor(value, div, held = false, scoring = false, group = '') {
+    constructor(value, div, held = false, scoring = false, groupCode = groupCodes[0]) {
 			this.value = value;         // the rolled value of the die
 			this.div = div;             // reference to visual element in window
             this.held = held;           // bool, is die in the held area?
             this.scoring = scoring;     // bool, is die currently worth any points?
-            this.group = group;         // A or B, or blank, representing what scoring group
+            this.groupCode = groupCode;    // helps designate what group certain dice are members of e.g. the three dice that make up "three of a kind"     
+
 
             this.div = document.createElement('div');
             this.div.classList.add('die');
 
             const val = Math.floor(Math.random() * 6 + 1);
             this.value = val;
-
             this.updateUI();
            // console.log(this);
 		}
@@ -57,10 +57,6 @@ class Game {
                 diceInPlay.push(newDie);
                 playArea.appendChild(newDie.div);
             }
-
-
-            console.log(anyScoring());
-           // console.log(`Dice: ${dice}`);
         }
 }
 //#endregion
@@ -78,10 +74,12 @@ const diceInPlay = [];
 const diceInHeld = [];
 
 // Global variables
-playerRoundScore = 0;
-playerTotalScore = 0;
-computerRoundScore = 0;
-computerTotalScorre = 0;
+playerRoundTotal = 0;
+playerScore = 0;
+computerRoundTotal = 0;
+computerScore = 0;
+
+const groupCodes = ['None', 'OfAKind', 'Partial', 'Straight', 'OfAKind 2']
 
 // Elements
 const playArea = document.querySelector('#play-area');
@@ -102,23 +100,25 @@ playArea.addEventListener('click', (e) => {
 
           //  console.log(targetDie.group);
 
-        // If not in a scoring group, move by itself
-        if (targetDie.group.length === 0) {
+        // If not in a group, move by itself
+        if (targetDie.groupCode === groupCodes[0]) {  // no group code
             moveDie(e.target);
-            calculateSoloValue(targetDie);
+            playerRoundTotal += calculateSoloValue(targetDie) || 0;
         }
         else {   // move all dice in the group
-            const all = allInGroup(targetDie.group);
+            const all = allInGroup(targetDie.groupCode);
             //console.log(all);
             all.forEach((die) => {
                 moveDie(die.div);
-
+                die.groupCode = groupCodes[1];   // group "OfAKind"
             })
-            calculateGroupValue(all);
+            playerRoundTotal += calculateGroupValue(all) || 0;
         }
 
         console.log(`In Play: ${diceInPlay.length}`);
         console.log(`In Held: ${diceInHeld.length}`);
+
+        console.log(`Player round total: ${playerRoundTotal}`);
     }
 })
 
@@ -141,8 +141,9 @@ buttonRoll.addEventListener('click', (e) => {
 
     // Clear dice from array and board
     diceInPlay.forEach((die) => {
-			if (diceInPlay.length > 0) die.div.remove();
-		});
+		if (diceInPlay.length > 0) 
+            die.div.remove();
+	});
 
     diceInPlay.length = 0;
 
@@ -221,7 +222,7 @@ function checkScoring() {
 		sixes: [],
 	};
 
-	console.log(`Checking dice in play: ${diceInPlay.length}`);
+	//console.log(`Checking dice in play: ${diceInPlay.length}`);
 
 	diceInPlay.forEach((die) => {
 
@@ -272,20 +273,20 @@ function checkScoring() {
 
 	// Iterate through sorted object's properties (the sorted arrays)
 	Object.entries(sorted).forEach((entry) => {
-		console.log(entry);
+		//console.log(entry);
 		if (entry[1].length >= 3) {
 			entry[1].forEach((die) => {
 				die.scoring = true;
 				die.div.classList.add('scoring-group');
 
-                // Assign each die a group ID
-                if (die.group === '') {
-				    die.group = 'A';
+                // Assign each die a groupCode
+                if (die.groupCode === groupCodes[0]) {
+				    die.groupCode = groupCodes[1];
                 }
-                // for the rare occasion that a player rolled two separate groups at once
-                else if (die.group === 'A') {    
-                    die.group = 'B';
-                }
+                // for the rare occasion that a player rolled two separate 3ofAKinds at once
+                else if (die.groupCode === groupCodes[1]) {   // group "OfAKind"
+					die.groupCode = groupCodes[4];            // group "OfAKind 2"
+				}
                    
                 
 			});
@@ -297,14 +298,14 @@ function checkScoring() {
 
     if (!anyScoring()) {
         console.log("NO SCORING DICE. END OF ROUND")
-        playerRoundScore = 0;
+        playerRoundTotal = 0;
         buttonRoll.classList.add('disabled');
     }
 	// At the end of processing, if there are no dice.scoring = true, end turn and lose points
 
 	// Print
 	// console.log(`Ones: ${ones.length}`);
-	// console.log(`Twos: ${twos.length}`);
+	// console.log(`Twos: ${twos.length}`);.
 	// console.log(`Threes: ${threes.length}`);
 	// console.log(`Fours: ${fours.length}`);
 	// console.log(`Fives: ${fives.length}`);
@@ -328,11 +329,9 @@ function checkParent(parent, child) {
 function anyInPlay(value) {
     const test = (die) => die.value === value;
     return diceInPlay.some(test);
-    
 }
 
-
-
+// TODO: Use .find()
 function anyScoring() {
     let found = false;
     diceInPlay.forEach((die) => {
@@ -341,13 +340,10 @@ function anyScoring() {
         }
     })
     return found;
-    // const test = (die) => die.scoring === 'true';
-    // return diceInPlay.some(test);
-    
 }
 
-function allInGroup(group) {
-    const test = (die) => die.group === group;
+function allInGroup(groupCode) {
+    const test = (die) => die.groupCode === groupCode;
 	return diceInPlay.filter(test);
 }
 
@@ -367,7 +363,11 @@ function calculateSoloValue(die) {
 
 function calculateGroupValue(dice) {
 
+    dice.forEach((die) => {
 
+
+
+    })
 
 
 }
