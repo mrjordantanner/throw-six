@@ -1,5 +1,17 @@
+// DICE GAME RULES ***
+//region [White]
+// a single 1 is worth 100 points;
+// a single 5 is worth 50 points;
+// three of a kind is worth 100 points multiplied by the given number, e.g. three 4s are worth 400 points;
+// three 1's are worth 1,000 points;
+// four or more of a kind is worth double the points of three of a kind, so four 4s are worth 800 points, five 4s are worth 1,600 points etc.
+// full straight 1-6 is worth 1500 points.
+// partial straight 1-5 is worth 500 points.
+// partial straight 2-6 is worth 750 points.
+//#endregion
+
 // CLASSES
-//#region [Blue]
+//#region [Purple]
 // Creates Die objects for use in play
 class Die {
 
@@ -25,39 +37,41 @@ class Die {
             this.div.innerText = `Value: ${this.value}, Held: ${this.held}, Scoring: ${this.scoring}`;
         }
 }
-
 // Controls game flow and functions
 class Game {
+	constructor() {}
 
-    constructor() {};
+	// ROUND FLOW
 
-    // ROUND FLOW
+	// user throws X = 6 dice
+	// values of dice are displayed on screen, scoring dice highlighted matching colors or borders
 
-    // user throws X = 6 dice
-    // values of dice are displayed on screen, scoring dice highlighted matching colors or borders
+	// if at least one scoring die rolled,
 
-    // if at least one scoring die rolled,
+	// user can:
+	// click Y scoring dice (or scoring group) to move them to held area
+	// end turn, gaining Z+=value points
+	// roll again with X-Y remaining dice
 
-    // user can:
-        // click Y scoring dice (or scoring group) to move them to held area
-            // end turn, gaining Z+=value points
-            // roll again with X-Y remaining dice
-    
-    // if no scoring dice rolled, end of turn with 0 points earned
+	// if no scoring dice rolled, end of turn with 0 points earned
 
-    // if END TURN, end of turn with Z points earned
+	// if END TURN, end of turn with Z points earned
 
-        throw(num) {
-            dice.length = 0;
-            // Create num dice in play area
-            console.log(`Throwing ${num} dice`);
-            for (let i = 1; i <= num; i++) {
-                const newDie = new Die();
-                dice.push(newDie);
-                diceInPlay.push(newDie);
-                playArea.appendChild(newDie.div);
+	throw(num) {
+		dice.length = 0;
+		// Create num dice in play area
+		console.log(`Throwing ${num} dice`);
+		for (let i = 0; i < num; i++) {
+			const newDie = new Die();
+            // dev option that assigns values to dice manually
+            if (useRiggedDice) {
+                newDie.value = riggedDice[i];
             }
-        }
+			dice.push(newDie);
+			diceInPlay.push(newDie);
+			playArea.appendChild(newDie.div);
+		}
+	}
 }
 //#endregion
 
@@ -81,10 +95,16 @@ computerScore = 0;
 
 const groupCodes = ['None', 'OfAKind', 'Partial', 'Straight', 'OfAKind 2']
 
+// Dev tools
+useRiggedDice = true;
+riggedDice = [1, 2, 3, 4, 5, 6];
+
 // Elements
 const playArea = document.querySelector('#play-area');
 const heldArea = document.querySelector('#held-area');
 const buttonRoll = document.querySelector('#button-roll');
+const roundText = document.querySelector('#round');
+const scoreText = document.querySelector('#score');
 
 //game.throw(6);
 
@@ -94,8 +114,6 @@ playArea.addEventListener('click', (e) => {
 
     const targetDie = getDieByDiv(e.target);
 
-
-
     if (e.target.classList.contains('die') && targetDie.scoring) {
 
           //  console.log(targetDie.group);
@@ -103,7 +121,7 @@ playArea.addEventListener('click', (e) => {
         // If not in a group, move by itself
         if (targetDie.groupCode === groupCodes[0]) {  // no group code
             moveDie(e.target);
-            playerRoundTotal += calculateSoloValue(targetDie) || 0;
+            playerRoundTotal += calculateSoloValue(targetDie);// || 0;
         }
         else {   // move all dice in the group
             const all = allInGroup(targetDie.groupCode);
@@ -112,13 +130,38 @@ playArea.addEventListener('click', (e) => {
                 moveDie(die.div);
                 die.groupCode = groupCodes[1];   // group "OfAKind"
             })
-            playerRoundTotal += calculateGroupValue(all) || 0;
+
+
+            // iterate through all groupCodes
+                // foreach one, 
+                //  calculateGroup value and add it to round total
+
+                // dont forget to be assiging these groupCodes
+
+                // are they really necessary?  
+                // why use logic to determine what group theyre in,
+                        // assign them a code
+                        // then use the code to find them again?
+                            // do we need to find them again, or can we just do everythjing
+                            // once upon determing the scoring pattern?
+
+                            // YES
+
+                            // identify them after rolling
+                                // 
+                            // indentity them when clicking
+
+                            // have an array of scoring groups
+                            //
+
+
+            playerRoundTotal += calculateGroupValue(all);// || 0;
         }
 
-        console.log(`In Play: ${diceInPlay.length}`);
-        console.log(`In Held: ${diceInHeld.length}`);
-
+        // console.log(`In Play: ${diceInPlay.length}`);
+        // console.log(`In Held: ${diceInHeld.length}`);
         console.log(`Player round total: ${playerRoundTotal}`);
+        updateScoreboard();
     }
 })
 
@@ -156,10 +199,16 @@ buttonRoll.addEventListener('click', (e) => {
     }
 
    checkScoring();
+   updateScoreboard();
 
 });
-
 //#endregion
+
+function updateScoreboard() {
+    roundText.innerText = playerRoundTotal;
+    scoreText.innerText = playerScore;
+}
+
 
 // for grabbing the Die object that this div is a property of
 function getDieByDiv(div) {
@@ -174,9 +223,9 @@ function getDieByDiv(div) {
 function moveDie(div) {
 
     // If in play area, move to held area
-  if (checkParent(playArea, div)) {
-       
-       heldArea.appendChild(div);
+    if (checkParent(playArea, div)) {
+
+        heldArea.appendChild(div);
         const die = getDieByDiv(div);
         die.held = true;   // TODO: this is buggy
         die.updateUI();
@@ -186,7 +235,7 @@ function moveDie(div) {
         diceInPlay.splice(index, 1);
         // put in diceInHeld array
         diceInHeld.push(die);
-  }
+    }
     // Moving dice out of held area
     // else
     // {
@@ -196,22 +245,11 @@ function moveDie(div) {
 
 }
 
-
-
-// a single 1 is worth 100 points;
-// a single 5 is worth 50 points;
-// three of a kind is worth 100 points multiplied by the given number, e.g. three 4s are worth 400 points;
-// three 1's are worth 1,000 points;
-// four or more of a kind is worth double the points of three of a kind, so four 4s are worth 800 points, five 4s are worth 1,600 points etc.
-// full straight 1-6 is worth 1500 points.
-// partial straight 1-5 is worth 500 points.
-// partial straight 2-6 is worth 750 points.
-
+	// SORTING
+	//#region [Purple]
 // Checks the dice in the playing area for dice that are worth points
 function checkScoring() {
 
-    // SORTING
-    //#region [Purple]
 	// Make an object of arrays to hold our dice sorted by their rolled values
 	const sorted = {
 		ones: [],
@@ -225,7 +263,6 @@ function checkScoring() {
 	//console.log(`Checking dice in play: ${diceInPlay.length}`);
 
 	diceInPlay.forEach((die) => {
-
 		// take inventory of how many of each number there are
 		switch (die.value) {
 			case 1:
@@ -252,18 +289,18 @@ function checkScoring() {
 				break;
 		}
 	});
-    //#endregion
+	//#endregion
 
-	// PROCESS
+	// PROCESSING
 
-	// Check for single 1's 
+	// Check for single 1's
 	if (sorted.ones.length > 0 && sorted.ones.length < 3) {
 		sorted.ones.forEach((die) => {
 			die.scoring = true;
 			die.div.classList.add('scoring');
 		});
 	}
-    // Check for single 5's
+	// Check for single 5's
 	if (sorted.fives.length > 0 && sorted.fives.length < 3) {
 		sorted.fives.forEach((die) => {
 			die.scoring = true;
@@ -279,31 +316,30 @@ function checkScoring() {
 				die.scoring = true;
 				die.div.classList.add('scoring-group');
 
-                // Assign each die a groupCode
-                if (die.groupCode === groupCodes[0]) {
-				    die.groupCode = groupCodes[1];
-                }
-                // for the rare occasion that a player rolled two separate 3ofAKinds at once
-                else if (die.groupCode === groupCodes[1]) {   // group "OfAKind"
-					die.groupCode = groupCodes[4];            // group "OfAKind 2"
+				// Assign each die a groupCode
+				if (die.groupCode === groupCodes[0]) {
+					die.groupCode = groupCodes[1];
 				}
-                   
-                
+				// for the rare occasion that a player rolled two separate three-of-a-kinds at once
+				else if (die.groupCode === groupCodes[1]) {
+					// group "of-a-kind"
+					die.groupCode = groupCodes[4];   // group "of-a-kind 2"
+				}
 			});
-            console.log(`Rolled ${entry[1].length} ${entry[0]}!`);
+			console.log(`Rolled ${entry[1].length} ${entry[0]}!`);
 		}
 	});
 
 	updateDiceUI();
 
-    if (!anyScoring()) {
-        console.log("NO SCORING DICE. END OF ROUND")
-        playerRoundTotal = 0;
-        buttonRoll.classList.add('disabled');
-    }
-	// At the end of processing, if there are no dice.scoring = true, end turn and lose points
+	// If no scoring dice were produced during the  roll, end turn and gain 0 points 
+	if (!anyScoring()) {
+		console.log('NO SCORING DICE. END OF ROUND');
+		playerRoundTotal = 0;
+		buttonRoll.classList.add('disabled');
+        updateScoreboard();
+	}
 
-	// Print
 	// console.log(`Ones: ${ones.length}`);
 	// console.log(`Twos: ${twos.length}`);.
 	// console.log(`Threes: ${threes.length}`);
@@ -360,24 +396,82 @@ function calculateSoloValue(die) {
 
 }
 
-
+// TODO: DRY this up!  consolidate conditionals, write generic formula to arrive at end value
 function calculateGroupValue(dice) {
+	// Check for a group of 1's bc they're special
+	const onesTest = (die) => die.value === 1;
+	if (dice.some(onesTest)) {
+		switch (dice.length) {
+			case 3:
+				return 1000;
+				break;
 
-    dice.forEach((die) => {
+			case 4:
+				return 2000;
+				break;
+
+			case 5:
+				return 4000;
+				break;
+
+			case 6:
+				return 8000;
+				break;
+		}
+	}
+
+	// Check for 'of-a-kind'
+	switch (dice.length) {
+		case 3:
+			return dice[0].value * 100 * 1;
+			break;
+
+		case 4:
+			return dice[0].value * 100 * 2;
+			break;
+
+		case 5:
+			return dice[0].value * 100 * 4;
+			break;
+
+		case 6:
+			return dice[0].value * 100 * 8;
+			break;
+	}
 
 
+	// Check for Straights
+    console.log(`AnyInPlay1: ${anyInplay(1)}`);
+    console.log(`AnyInPlay2: ${anyInplay(2)}`);
+    console.log(`AnyInPlay3: ${anyInplay(3)}`);
+    console.log(`AnyInPlay4: ${anyInplay(4)}`);
+    console.log(`AnyInPlay5: ${anyInplay(5)}`);
+    console.log(`AnyInPlay6: ${anyInplay(6)}`);
 
-    })
+
+    if (anyInPlay(2) && anyInPlay(3) && anyInPlay(4) && anyInPlay(5)) {
+        if (anyInplay(1) && anyInplay(6)) {
+            // full straight
+            console.log('Full Straight');
+            return 1500;
+        }
+        
+        else if (anyInplay(1)) {
+            // low partial straight
+            console.log('Low Partial Straight');
+            return 500;
+        }
+
+        else if (anyInPlay(6)) {
+            // high partial straight
+            console.log('High Partial Straight')
+            return 750;
+        }
+
+
+    }
+
+
 
 
 }
-
-
-
-// three of a kind is worth 100 points multiplied by the given number, e.g. three 4s are worth 400 points;
-// three 1's are worth 1,000 points;
-// four or more of a kind is worth double the points of three of a kind, so four 4s are worth 800 points, five 4s are worth 1,600 points etc.
-
-// full straight 1-6 is worth 1500 points.
-// partial straight 1-5 is worth 500 points.
-// partial straight 2-6 is worth 750 points.

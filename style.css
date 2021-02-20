@@ -3,6 +3,8 @@
 }
 
 
+
+
 /* Basic HTML elements */
 body {
     background: #222222;
@@ -21,7 +23,27 @@ a {
 
 
 
-/* Area DIVs */
+/* Text */
+
+#score {
+    display:block;
+    position: absolute;
+    top: 10px;
+    right: 100px;
+}
+
+#round {
+    display:block;
+    position: absolute;
+    bottom: 10px;
+    left: 450px;
+}
+
+
+
+
+
+/* Dice Areas */
 .area {
     display: flex;
     border: 1px cyan solid;
@@ -36,7 +58,7 @@ a {
 
 .flex-row {
     flex-direction: row;
-     flex-wrap: wrap;
+    flex-wrap: wrap;
 }
 
 .flex-column {
@@ -69,8 +91,8 @@ a {
 /* Dice DIVS */
 .die {
     display: block;
-    height: 100px;
-    width: 100px; 
+    height: 150px;
+    width: 150px; 
     border: solid 1px red;
     text-align: center;
     justify-content: center;
@@ -78,33 +100,45 @@ a {
 }
 
 .die:hover {
-    border: white solid 1px;
+    border: orange solid 1px;
 }
 
 .scoring {
     background: blue;
+    /* border: 2px solid blue; */
 }
 
 .scoring-group {
     background: orange;
+    /* border: 2px solid blue; */
 }
 
 /* Buttons  */
 
 a.button {
-    display: block;
-    width: 150px;
-    height: 75px;
-    border: 2px orange solid;
+    position: absolute;
+    width: 100px;
+    height: 50px;
+    border: 4px orange solid;
     text-align: center;
     text-decoration: none;
-    color: white;
-    
+    color: orange;
+    cursor: default;
 }
 
 a.button:hover {
     border: 2px white solid;
     background: #333333;
+}
+
+#button-roll {
+    bottom: 40px;
+    right: 20px;
+}
+
+#button-end {
+    bottom: 40px;
+    left: 40px; 
 }
 
 .disabled {
