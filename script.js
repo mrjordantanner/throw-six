@@ -133,15 +133,13 @@ buttonRoll.addEventListener('click', (e) => {
         game.throw(numberOfDice);
     }
 
-   // checkScoring();
-
-
+   checkScoring();
 
 
    // TESTING
-    dice.forEach((die) => {
-       // console.log(die);
-    });
+    // dice.forEach((die) => {
+    //    // console.log(die);
+    // });
 
     //console.log(``)
 
@@ -152,17 +150,14 @@ buttonRoll.addEventListener('click', (e) => {
 
 //#endregion
 
-function getDieByDiv(die) {
-	// compare against all dice.div
+function getDieByDiv(div) {
+	// for grabbing the Die object that this div is a property of
 	for (let i = 0; i <= dice.length; i++) {
-		if (dice[i].div === die) {
+		if (dice[i].div === div) {
 			return dice[i];
 		}
 	}
 }
-
-
-
 
 // 'moves' the die and re-appends its corresponding div
 function moveDie(div) {
@@ -174,7 +169,6 @@ function moveDie(div) {
         const die = getDieByDiv(div);
         die.held = true;
         die.updateUI();
-
 
     }
     // Moving dice out of held area
@@ -212,7 +206,7 @@ function checkScoring() {
 
     diceToCheck.forEach((die) => {
 
-      //  console.log(die);
+        //console.log(die);
 
         // SORT
         // take inventory of how many of each number there are
@@ -249,6 +243,18 @@ function checkScoring() {
             // if so, die.scoring = true;
             // add styling class to dice to indicate they are scoring dice
 
+
+        if (ones.length > 0) {
+            ones.forEach((die) => {
+
+                die.scoring = true;
+                die.div.classList.add('scoring');
+                die.updateUI();
+
+            })
+        }
+
+
         // are there any three's of a kind (not of 1's and 5's)?
             // if so, die.scoring = true;
             // const scoringGroup = [];
@@ -256,14 +262,15 @@ function checkScoring() {
 
 
 
-
-
-
-
-
-
-
     })
+
+
+        // console.log(`Ones: ${ones.length}`);
+        // console.log(`Twos: ${twos.length}`);
+        // console.log(`Threes: ${threes.length}`);
+        // console.log(`Fours: ${fours.length}`);
+        // console.log(`Fives: ${fives.length}`);
+        // console.log(`Sixes: ${sixes.length}`);
 
 
 
