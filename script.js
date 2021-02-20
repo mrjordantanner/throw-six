@@ -3,11 +3,12 @@
 // Creates Die objects for use in play
 class Die {
 
-    constructor(value, div, held = false, scoring = false) {
+    constructor(value, div, held = false, scoring = false, group = '') {
 			this.value = value;         // the rolled value of the die
 			this.div = div;             // reference to visual element in window
             this.held = held;           // bool, is die in the held area?
             this.scoring = scoring;     // bool, is die currently worth any points?
+            this.group = group;         // A or B, or blank, representing what scoring group
 
             this.div = document.createElement('div');
             this.div.classList.add('die');
@@ -56,24 +57,16 @@ class Game {
                 diceInPlay.push(newDie);
                 playArea.appendChild(newDie.div);
             }
+
+            console.log(`Dice: ${dice}`);
         }
-
-        // Removes die from array as well as play/held area
-        removeDie() {
-
-
-
-
-        }
-
-
 }
 //#endregion
 
 
 
 
-// INITIALIZATION
+// INITIALIZATION & SETUP
 //#region [Blue]
 
 const game = new Game();
@@ -90,27 +83,45 @@ const buttonRoll = document.querySelector('#button-roll');
 playArea.addEventListener('click', (e) => {
     e.preventDefault();
 
-    if (e.target.classList.contains('die')) {
-        //console.log(`button e.target: ${e.target}`);
-        moveDie(e.target);
+    const targetDie = getDieByDiv(e.target);
+
+
+
+    if (e.target.classList.contains('die') && targetDie.scoring) {
+
+          //  console.log(targetDie.group);
+
+        // If not in a scoring group, move by itself
+        if (targetDie.group.length === 0) {
+            moveDie(e.target);
+        }
+        else {   // move all dice in the group
+            const all = allInGroup(targetDie.group);
+            //console.log(all);
+            all.forEach((die) => {
+                moveDie(die.div);
+            })
+        }
+
+        console.log(`In Play: ${diceInPlay.length}`);
+        console.log(`In Held: ${diceInHeld.length}`);
     }
 })
 
-heldArea.addEventListener('click', (e) => {
-	e.preventDefault();
+// Click in held area
+// heldArea.addEventListener('click', (e) => {
+// 	e.preventDefault();
 
-	if (e.target.classList.contains('die')) {
-		moveDie(e.target);
-	}
-});
+// 	if (e.target.classList.contains('die')) {
+// 		moveDie(e.target);
+// 	}
+// });
 
 // Roll Button
 buttonRoll.addEventListener('click', (e) => {
 	e.preventDefault();
-
    // console.clear();
 
-    //const numberOfDice = playArea.querySelectorAll('.die').length;
     const numberOfDice = diceInPlay.length;
     console.log(`Dice in playArea: ${numberOfDice}`)
 
@@ -120,16 +131,6 @@ buttonRoll.addEventListener('click', (e) => {
 		});
 
     diceInPlay.length = 0;
-
-    // const notHeld = dice.filter((die) => die.held === false);
-    // //console.log(`dice: ${dice.length}`);
-    // console.log(`notHeld: ${notHeld.length}`);
-
-    // notHeld.forEach((die) => {
-    //     console.log(die);
-    //     die.remove();
-    // })
-
 
     // If board is empty, throw 6 die, otherwise throw remaining die already on board
     if (numberOfDice === 0 && diceInHeld.length === 0) {
@@ -141,40 +142,28 @@ buttonRoll.addEventListener('click', (e) => {
 
    checkScoring();
 
-
-   // TESTING
-    // dice.forEach((die) => {
-    //    // console.log(die);
-    // });
-
-    //console.log(``)
-
-    //console.log(`Ones in play? ${anyInPlay(1)}`);
-
-
-
 });
 
 //#endregion
 
+// for grabbing the Die object that this div is a property of
 function getDieByDiv(div) {
-	// for grabbing the Die object that this div is a property of
-	for (let i = 0; i <= dice.length; i++) {
+	for (let i = 0; i < dice.length; i++) {
 		if (dice[i].div === div) {
 			return dice[i];
 		}
 	}
 }
 
-// 'moves' the die and re-appends its corresponding div
+// 'moves' the die and re-appends its corresponding div to playArea (or heldArea)
 function moveDie(div) {
 
     // If in play area, move to held area
-    if (checkParent(playArea, div)) {
-
-        heldArea.appendChild(div);
+  if (checkParent(playArea, div)) {
+       
+       heldArea.appendChild(div);
         const die = getDieByDiv(div);
-        die.held = true;
+        die.held = true;   // TODO: this is buggy
         die.updateUI();
 
         // remove from diceInPlay array 
@@ -182,7 +171,7 @@ function moveDie(div) {
         diceInPlay.splice(index, 1);
         // put in diceInHeld array
         diceInHeld.push(die);
-    }
+  }
     // Moving dice out of held area
     // else
     // {
@@ -206,6 +195,8 @@ function moveDie(div) {
 // Checks the dice in the playing area for dice that are worth points
 function checkScoring() {
 
+    // SORTING
+    //#region [Purple]
 	// Make an object of arrays to hold our dice sorted by their rolled values
 	const sorted = {
 		ones: [],
@@ -219,9 +210,7 @@ function checkScoring() {
 	console.log(`Checking dice in play: ${diceInPlay.length}`);
 
 	diceInPlay.forEach((die) => {
-		//console.log(die);
 
-		// SORT
 		// take inventory of how many of each number there are
 		switch (die.value) {
 			case 1:
@@ -248,12 +237,9 @@ function checkScoring() {
 				break;
 		}
 	});
+    //#endregion
 
 	// PROCESS
-
-	// are there any 1's and 5's?
-	// if so, die.scoring = true;
-	// add styling class to dice to indicate they are scoring dice
 
 	// Check for single 1's 
 	if (sorted.ones.length > 0 && sorted.ones.length < 3) {
@@ -277,7 +263,15 @@ function checkScoring() {
 			entry[1].forEach((die) => {
 				die.scoring = true;
 				die.div.classList.add('scoring-group');
-				// scoringGroup.push(die);
+
+                // Assign each die a group ID
+                if (die.group === '') {
+				    die.group = 'A';
+                }
+                else{
+                    throw console.error(`${die} already a member of a scoring group`);
+                }
+                
 			});
             console.log(`Rolled ${entry[1].length} ${entry[0]}!`);
 		}
@@ -285,12 +279,10 @@ function checkScoring() {
 
 	updateDiceUI();
 
-
     // how will "scoring groups" work?  i.e How will the grouping of similar dice work? 
         // 1) Have a scoringGroup property on each dice object that we set, and compare with e.g. 'A' or 'B' etc
         // 2) DESIGNATE the existing array as a scoring group 
             // e.g. this group of three 4's 
-
 
 
 	// are there any three's of a kind (not of 1's and 5's)?
@@ -317,13 +309,19 @@ function updateDiceUI() {
 }
 
 function checkParent(parent, child) {
-	if (parent.contains(child)) return true;
+	if (parent.contains(child)) {
+        return true;
+    }
 	return false;
 } 
 
 function anyInPlay(value) {
-
     const test = (die) => die.value === value;
     return diceInPlay.some(test);
     
+}
+
+function allInGroup(group) {
+    const test = (die) => die.group === group;
+	return diceInPlay.filter(test);
 }
