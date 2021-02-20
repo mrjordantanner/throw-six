@@ -81,6 +81,10 @@ a {
     border: white solid 1px;
 }
 
+.scoring {
+    background: chartreuse;
+}
+
 
 /* Buttons  */
 

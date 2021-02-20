@@ -3,7 +3,7 @@
 // Creates Die objects for use in play
 class Die {
 
-    constructor(value, div, held, scoring) {
+    constructor(value, div, held = false, scoring = false) {
 			this.value = value;         // the rolled value of the die
 			this.div = div;             // reference to visual element in window
             this.held = held;           // bool, is die in the held area?
@@ -11,13 +11,18 @@ class Die {
 
             this.div = document.createElement('div');
             this.div.classList.add('die');
-            // playArea.appendChild(this.div);
+
             const val = Math.floor(Math.random() * 6 + 1);
             this.value = val;
-            this.div.innerText = val;
 
-            console.log(this);
+            this.updateUI();
+           // console.log(this);
 		}
+
+        // updates text on the die for testing
+        updateUI() {
+            this.div.innerText = `Value: ${this.value}, Held: ${this.held}, Scoring: ${this.scoring}`;
+        }
 }
 
 // Controls game flow and functions
@@ -43,7 +48,7 @@ class Game {
 
         throw(num) {
             // Create num dice in play area
-
+            console.log(`Throwing ${num} dice`);
             for (let i = 1; i <= num; i++) {
                 const newDie = new Die();
                 dice.push(newDie);
@@ -75,12 +80,14 @@ const playArea = document.querySelector('#play-area');
 const heldArea = document.querySelector('#held-area');
 const buttonRoll = document.querySelector('#button-roll');
 
+//game.throw(6);
 
 // Event listeners
 playArea.addEventListener('click', (e) => {
     e.preventDefault();
 
     if (e.target.classList.contains('die')) {
+        //console.log(`button e.target: ${e.target}`);
         moveDie(e.target);
     }
 })
@@ -93,52 +100,210 @@ heldArea.addEventListener('click', (e) => {
 	}
 });
 
+// Roll Button
 buttonRoll.addEventListener('click', (e) => {
 	e.preventDefault();
 
-	const diceInPlay = playArea.querySelectorAll('.die');
-    const numberOfDice = diceInPlay.length;
+   // console.clear();
 
-    diceInPlay.forEach((die) => {
-        die.remove();
+    const numberOfDice = playArea.querySelectorAll('.die').length;
+    console.log(`Dice in playArea: ${numberOfDice}`)
+
+
+    diceInPlay().forEach((die) => {
+        if (diceInPlay().length > 0)
+            die.div.remove();
     })
 
+    // const notHeld = dice.filter((die) => die.held === false);
+    // //console.log(`dice: ${dice.length}`);
+    // console.log(`notHeld: ${notHeld.length}`);
 
-	game.throw(numberOfDice);
+    // notHeld.forEach((die) => {
+    //     console.log(die);
+    //     die.remove();
+    // })
+
+
+    // If board is empty, throw 6 die, otherwise throw remaining die already on board
+    if (numberOfDice === 0 && diceInHeld().length === 0) {
+        game.throw(6);
+    }
+    else {
+        game.throw(numberOfDice);
+    }
+
+   // checkScoring();
+
+
+
+
+   // TESTING
+    dice.forEach((die) => {
+       // console.log(die);
+    });
+
+    //console.log(``)
+
+
+
+
 });
 
 //#endregion
 
-// const myDie = new Die();
-// playArea.appendChild(myDie.div);
-
-// const myDie2 = new Die();
-// playArea.appendChild(myDie2.div);
-
-game.throw(6);
-
-// console.log('Dice in play:')
-// console.log(diceInPlay);
+function getDieByDiv(die) {
+	// compare against all dice.div
+	for (let i = 0; i <= dice.length; i++) {
+		if (dice[i].div === die) {
+			return dice[i];
+		}
+	}
+}
 
 
-function moveDie(die) {
 
-    const inPlay = checkParent(playArea, die);
 
-        if (inPlay) {
-            heldArea.appendChild(die);
-            die.held = true;
-        }
-        // else
-        // {
-        //     playArea.appendChild(die);
-        //     die.held = false;
-        // }
+// 'moves' the die and re-appends its corresponding div
+function moveDie(div) {
+
+    // If in play area, move to held area
+    if (checkParent(playArea, div)) {
+
+        heldArea.appendChild(div);
+        const die = getDieByDiv(div);
+        die.held = true;
+        die.updateUI();
+
+
+    }
+    // Moving dice out of held area
+    // else
+    // {
+    //     playArea.appendChild(die);
+    //     die.held = false;
+    // }
 
 }
+
+
+
+// a single 1 is worth 100 points;
+// a single 5 is worth 50 points;
+// three of a kind is worth 100 points multiplied by the given number, e.g. three 4s are worth 400 points;
+// three 1's are worth 1,000 points;
+// four or more of a kind is worth double the points of three of a kind, so four 4s are worth 800 points, five 4s are worth 1,600 points etc.
+// full straight 1-6 is worth 1500 points.
+// partial straight 1-5 is worth 500 points.
+// partial straight 2-6 is worth 750 points.
+
+// Checks the dice in the playing area for dice that are worth points
+function checkScoring() {
+
+    const diceToCheck = diceInPlay();
+        const ones = [];
+            const twos = [];
+                const threes = [];
+                    const fours = [];
+                        const fives = [];
+                            const sixes = [];
+
+    console.log(`Checking dice in play: ${diceToCheck.length}`);
+
+    diceToCheck.forEach((die) => {
+
+      //  console.log(die);
+
+        // SORT
+        // take inventory of how many of each number there are
+        switch (die.value) {
+
+					case 1:
+						ones.push(die);
+						break;
+
+					case 2:
+                        twos.push(die);
+						break;
+
+					case 3:
+                        threes.push(die);
+						break;
+					case 4:
+                        fours.push(die);
+						break;
+
+					case 5:
+                        fives.push(die);
+						break;
+
+					case 6:
+                        sixes.push(die);
+						break;
+    
+				}
+
+        // PROCESS
+
+        // are there any 1's and 5's?
+            // if so, die.scoring = true;
+            // add styling class to dice to indicate they are scoring dice
+
+        // are there any three's of a kind (not of 1's and 5's)?
+            // if so, die.scoring = true;
+            // const scoringGroup = [];
+            // scoringGroup.push(each die);
+
+
+
+
+
+
+
+
+
+
+    })
+
+
+
+
+
+}
+
 
 
 function checkParent(parent, child) {
 	if (parent.contains(child)) return true;
 	return false;
 } 
+
+
+
+// TODO:  Use filter instead
+function diceInPlay() {
+	const returnDice = [];
+
+	dice.forEach((die) => {
+		if (!die.held) {
+			returnDice.push(die);
+			//console.log(`${die.value} is in play`);
+		}
+	});
+	return returnDice;
+	//return playArea.querySelectorAll('.die');
+
+}
+
+function diceInHeld() {
+    const returnDice = [];
+
+    dice.forEach((die) => {
+        if (die.held) {
+            returnDice.push(die);
+            console.log(`${die.value} is in held`);
+        }
+    });
+    return returnDice;
+	//return playArea.querySelectorAll('.die');
+}
