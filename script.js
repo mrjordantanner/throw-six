@@ -11,7 +11,7 @@
 //#endregion
 
 // CLASSES
-//#region [Purple]
+//#region [Green]
 // Creates Die objects for use in play
 class Die {
 	constructor(faceValue, div, held = false, scoring = false, group, ui) {
@@ -55,7 +55,7 @@ class Game {
 			if (useRiggedDice) {
 				newDie.faceValue = riggedDice[i];
 			}
-			console.log(`Rolled ${newDie.faceValue}`);
+			//console.log(`Rolled ${newDie.faceValue}`);
 			dice.push(newDie);
 			diceInPlay.push(newDie);
 			playArea.appendChild(newDie.div);
@@ -80,24 +80,91 @@ class Game {
 
 		this.handleDiceThrow();
 
+        // Get all scoring dice and move them to held area
+        getAllScoring().forEach((scoringDie) => {
+            if (scoringDie.group.type === 'Single') {
+                console.log('cpu moving single');
+                computerRoundTotal += scoringDie.group.value;
+                moveDie(scoringDie.div);
+
+            } else {
+                scoringDie.group.members.forEach((die) => {
+                    console.log('cpu moving group');
+                    computerRoundTotal += scoringDie.group.value;
+                    moveDie(die.div);
+                });
+            }
+
+        })
+
+        // if less than 3 dice remaining, end turn
+            // otherwise throw remaining dice 
+
+
+        // let i = 0;
+        // while (anyScoring) {   
+        //     console.log(`Loop ${i}`);
+
+
+        //     if (get[i].scoring) {
+
+		// 		if (diceInPlay[i].group.type === 'Single') {
+		// 			console.log('cpu moving single');
+        //             computerRoundTotal += diceInPlay[i].group.value;
+		// 			moveDie(diceInPlay[i].div);
+
+		// 		} else {
+		// 			diceInPlay[i].group.members.forEach((die) => {
+		// 				console.log('cpu moving group');
+        //                 computerRoundTotal += diceInPlay[i].group.value;
+		// 				moveDie(die.div);
+		// 			});
+		// 		}
+        //     }
+
+        //     i++;
+        //     // Emergency exit
+        //     if (i >= 6) {
+        //         console.log('exited loop');
+        //         return;
+        //     }
+        // }
+
+
 		// Select all scoring die and move them to held area
-		for (let i = 0; i <= diceInPlay.length; i++) {
-			if (diceInPlay[i].scoring && diceInPlay.length > 0) {
-				console.log('A');
-				if (diceInPlay[i].group.type === 'Single') {
-					console.log('cpu moving single');
-					moveDie(diceInPlay[i].div);
-				} else {
-					diceInPlay[i].group.members.forEach((die) => {
-						console.log('cpu moving group');
-						moveDie(die.div);
-					});
-				}
-				computerRoundTotal += diceInPlay[i].group.value;
-				console.log(`CPU round total: ${computerRoundTotal}`);
-				updateScoreboard();
-			}
-		}
+		// for (let i = 0; i <= diceInPlay.length; i++) {
+
+
+        //     // diceInPlay.length:  number of dice in playing area
+        //     // i = index of loop, 0 up to and including diceInPlay.length
+        //     // diceInPlay[i] = the current die for this iteration of the loop
+
+
+        //     console.log(`diceInPlay.length:  ${diceInPlay.length}`);
+        //     console.log(`${i}, ${diceInPlay[i]}`);
+
+		// 	if (diceInPlay[i].scoring && diceInPlay.length > 0) {
+
+		// 		console.log('cpu found scoring die(s)');
+
+		// 		if (diceInPlay[i].group.type === 'Single') {
+		// 			console.log('cpu moving single');
+        //             computerRoundTotal += diceInPlay[i].group.value;
+		// 			moveDie(diceInPlay[i].div);
+
+		// 		} else {
+		// 			diceInPlay[i].group.members.forEach((die) => {
+		// 				console.log('cpu moving group');
+        //                 computerRoundTotal += diceInPlay[i].group.value;
+		// 				moveDie(die.div);
+		// 			});
+		// 		}
+
+		// 		//computerRoundTotal += diceInPlay[i].group.value;
+		// 		console.log(`CPU round total: ${computerRoundTotal}`);
+		// 		updateScoreboard();
+		// 	}
+		// }
 
 		//// If less than 3 dice in play, end turn.  Otherwise roll again
 		// if (diceInPlay < 3) {
@@ -117,7 +184,7 @@ class Game {
 		disable(buttonRoll);
 
 		const numberOfDice = diceInPlay.length;
-		console.log(`Dice in playArea: ${numberOfDice}`);
+		//console.log(`Dice in playArea: ${numberOfDice}`);
 
 		clearPlayArea();
 
@@ -270,6 +337,7 @@ buttonEnd.addEventListener('click', (e) => {
 
 })
 
+// COMPUTER TURN BUTTON
 runCPU.addEventListener('click', (e) => {
     e.preventDefault();
     playersTurn = false;
@@ -650,6 +718,18 @@ function anyScoring() {
         }
     })
     return found;
+}
+
+// TODO: Use .find();
+function getAllScoring() {
+    let found = [];
+    diceInPlay.forEach((die) => {
+        if (die.scoring === true || die.scoring === 'true') {
+            found.push(die);
+        }
+    })
+    return found;
+
 }
 
 function clearPlayArea() {
