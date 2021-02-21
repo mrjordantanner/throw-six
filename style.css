@@ -3,8 +3,6 @@
 }
 
 
-
-
 /* Basic HTML elements */
 body {
     background: #222222;
@@ -13,34 +11,12 @@ body {
 }
 
 h1 {
-    font-size: 48px;
+    font-size: 36px;
 }
 
 a {
     text-decoration: none;
 }
-
-
-
-
-/* Text */
-
-#score {
-    display:block;
-    position: absolute;
-    top: 10px;
-    right: 100px;
-}
-
-#round {
-    display:block;
-    position: absolute;
-    bottom: 10px;
-    left: 450px;
-}
-
-
-
 
 
 /* Dice Areas */
@@ -103,7 +79,7 @@ a {
     border: orange solid 1px;
 }
 
-.scoring {
+.scoring-solo {
     background: blue;
     /* border: 2px solid blue; */
 }
@@ -111,6 +87,30 @@ a {
 .scoring-group {
     background: orange;
     /* border: 2px solid blue; */
+}
+
+.scoring-straight {
+    background: purple;
+}
+
+
+
+
+
+/* Text */
+
+#score {
+    display:block;
+    position: absolute;
+    bottom: 10px;
+    right: 100px;
+}
+
+#round {
+    display:block;
+    position: absolute;
+    bottom: 20px;
+    left: 200px;
 }
 
 /* Buttons  */
@@ -133,18 +133,18 @@ a.button:hover {
 
 #button-roll {
     bottom: 40px;
-    right: 20px;
+    left: 550px;
 }
 
 #button-end {
     bottom: 40px;
-    left: 40px; 
+    left: 50px; 
 }
 
 .disabled {
     visibility: hidden;
-    color: gray;
+    /* color: gray;
     background: gray;
     pointer-events: none;
-    border: gray dashed 1px;
+    border: gray dashed 1px; */
 }
