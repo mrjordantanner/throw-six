@@ -12,19 +12,22 @@ body {
 }
 
 h1 {
-    font-size: 30px;
+    font-size: 24px;
+    pointer-events: none;;
 }
 
 a {
     text-decoration: none;
 }
 
+p {
+    pointer-events: none;
+}
 
 /* Dice Areas */
 .area {
     display: flex;
     border: 1px cyan solid;
-    height: 80vh;
     margin: 25px;
 }
 
@@ -56,14 +59,27 @@ a {
 
 #play-area {
     background: black;
-    flex: 2;
+    /* flex: 2; */
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    height: 100%;
+    width: 100%;
+
+
 }
 
 
 #held-area {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
     background: black;
-    flex: 1.2;
     border: 4px solid orange;
+    margin-left:10%;
+    width: 80%;
+    /* height: 100%; */
+    height:300px;
 }
 
 
@@ -72,13 +88,13 @@ a {
     /* position: relative; */
     display: flex;
     flex-direction: column;
-    height: 150px;
-    width: 150px; 
+    height: 75px;
+    width: 75px; 
     border: solid 1px red;
     text-align: center;
     align-items: center;
     justify-content: center;
-    margin: 20px;
+    margin: 10px;
 
     font-weight: bold;
     font-size:30px;
@@ -139,57 +155,50 @@ a {
 
 /* Text */
 #score {
-    display:block;
-    position: absolute;
-    bottom: 50px;
-    right: 50px;
+/* display: inline; */
+float: right;
+color: chartreuse;
 }
 
 #label-score {
-    display:block;
+    /* display:block;
     position: absolute;
     bottom: 85px;
-    right: 50px;
+    right: 50px; */
 }
 
 #computer-score {
-    display:block;
-    position: absolute;
-    bottom: 10px;
-    right: 50px;
+    display: inline;
+    float:left;
     color:red;
 }
 
 #label-computer-score {
-    display:block;
+    /* display:block;
     position: absolute;
     bottom: 40px;
     right: 50px;
-    color:red;
+    color:red; */
 }
 
 #round {
-    display:block;
+    /* display:block;
     position: absolute;
     bottom: 0px;
-    left: 300px;
+    left: 300px; */
     font-size: 48px;
 }
 
 #label-round {
-    display:block;
+    /* display:block;
     position: absolute;
     bottom: 75px;
-    left: 250px;
+    left: 250px; */
 }
 
 #message {
-    display:block;
-    position: absolute;
-    bottom: 150px;
-    right: 120px;
     color:white;
-    font-size: 48px;
+    font-size: 24px;
     text-align: center;
 }
 
@@ -219,20 +228,18 @@ a.button:active {
     background: white;
 }
 
-#button-roll {
-    bottom: 40px;
-    left: 550px;
-}
 
 #button-end {
-    bottom: 40px;
-    left: 50px; 
+    /* top: 70%; */
+    left: 0;
+    position: relative;
 }
 
-#button-runCPU {
-    border: 3px solid chartreuse;
-    bottom: 40px;
-    left: 750px; 
+#button-roll {
+    /* top: 85%; */
+    left: 0;
+    position: relative;
+
 }
 
 
@@ -243,3 +250,110 @@ a.button:active {
     pointer-events: none;
     border: gray dashed 1px; */
 }
+
+
+
+/* Console colors and styling */
+
+.bg-red {
+    background: red;
+    color: white;
+}
+
+.bg-green {
+    background: chartreuse;
+}
+
+.black {
+    color: black;
+}
+
+.green {
+    color: chartreuse;
+}
+
+.red-bold {
+    color:red;
+    font-weight: bold;
+}
+
+.cyan {
+    color: cyan;
+}
+
+.gray {
+    color: gray;
+}
+
+#console-container {
+    /* display: none; */
+    width: 100%;
+    height:100%;
+    padding: 20px;
+    overflow-y: scroll;
+    
+}
+
+#console-container::-webkit-scrollbar {
+    width: 1em;
+  }
+
+.console-line {
+    display: block;
+    width: 95%;
+    /* height: 12px; */
+    font-size: 16px;
+    color: white;
+    margin:2px;
+    /* line-height: 0.15rem; */
+}
+
+
+/* Grid */
+/* I used https://grid.layoutit.com/ to generate this */
+.grid-container {
+    height: 97vh;
+    display: grid;
+    grid-template-columns: 0.8fr 2.8fr;
+    grid-template-rows: 0.4fr 3.3fr 1.5fr 1.6fr 0.6fr;
+    gap: 0px 0px;
+    grid-template-areas:
+      "topLeft header"
+      "heldArea playArea"
+      "roundInfo playArea"
+      "console playArea"
+      "console footer";
+  }
+ 
+  .heldArea { grid-area: heldArea; border: 1px solid transparent;}
+  .roundInfo { 
+      display: flex;
+      /* flex-direction: ; */
+      grid-area: roundInfo; 
+      border: 1px solid transparent;
+    }
+  .playArea { 
+      grid-area: playArea; 
+      border: 1px solid cyan;
+    
+    }
+  .console { grid-area: console; border: 1px solid transparent;}
+  .footer { grid-area: footer; border: 1px solid transparent;}
+  .header { grid-area: header; border: 1px solid transparent;}
+  .topLeft { grid-area: topLeft; border: 1px solid transparent;}
+
+
+
+  /* sub-grid for Round Info section */
+  /* .grid-round {
+    display: grid;
+    grid-template-columns: 1.1fr 1.1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 0px 0px;
+    grid-template-areas:
+      "labelRound buttonEnd"
+      "round buttonEnd";
+  }
+  .buttonEnd { grid-area: buttonEnd; }
+  .roundLabel { grid-area: roundLabel; }
+  .roundScore { grid-area: roundScore; } */

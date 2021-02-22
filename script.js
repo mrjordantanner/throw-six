@@ -11,7 +11,7 @@
 //#endregion
 
 // CLASSES
-//#region [Violet]
+//#region [Blue]
 // Creates Die objects for use in play
 class Die {
 	constructor(faceValue, div, held = false, scoring = false, group, uiFaceValue, uiPointValue) {
@@ -53,171 +53,6 @@ class Die {
 	}
 }
 
-// Controls game flow and functions
-class Game {
-	constructor() {}
-
-	throw(num) {
-		dice.length = 0;
-        let rolledMessage = `Rolled `;
-		// Create num dice in play area
-		write(`Throwing ${num} dice`, 'blue');
-		for (let i = 0; i < num; i++) {
-			const newDie = new Die();
-			// Manually set the dice value for testing
-			if (useRiggedDice) {
-				newDie.faceValue = riggedDice[i];
- 			}
-            rolledMessage += newDie.faceValue.toString() + ' ';
-			dice.push(newDie);
-			diceInPlay.push(newDie);
-			playArea.appendChild(newDie.div);
-		}
-        
-        write(rolledMessage, 'white-bold');
-	}
-
-	startPlayerTurn() {
-		playersTurn = true;
-		write("== Start of Player's turn", 'bg-green');
-	}
-
-    startCPUTurn() {
-        write("== Start of CPU's turn", 'bg-red');
-        disable(buttonRoll);
-        disable(buttonEnd);
-        this.cpuTurn();
-    }
-
-	// Control computer's turn
-	cpuTurn() {
-
-        // TODO: setInterval here for cpu turn delay
-
-        // throw dice, checkScoring, and updateScoreboard
-        this.handleDiceThrow();
-        // Get all scoring dice and move them to held area
-        this.moveScoringGroups();
-
-		console.log(`CPU Round total: ${roundTotal}`);
-        //console.log(`diceInPlay.length: ${diceInPlay.length}`);
-		// Check remaining dice, if more than 2, roll again
-		if (diceInPlay.length > 2) {
-            this.cpuTurn();
-		}
-		// Otherwise end turn
-		else {
-			this.endTurn();
-		}
-	}
-
-	handleDiceThrow() {
-
-		if (playersTurn) {
-			disable(buttonRoll);
-		}
-
-        const remainingDice = diceInPlay.length;
-		clearPlayArea();
-
-        // First turn throw 6 dice, otherwise throw remaining dice
-		if (diceInHeld.length === 0) {
-			game.throw(6);
-		} else {
-			game.throw(remainingDice);
-		}
-
-		checkScoring();
-		updateDiceUI();
-		this.updateScoreboard();
-	}
-
-	updateScoreboard() {
-		if (playersTurn) {
-			roundText.innerText = roundTotal;
-		} else {
-			roundText.innerText = roundTotal;
-		}
-
-		scoreText.innerText = playerScore;
-		computerScoreText.innerText = computerScore;
-	}
-
-	endTurn() {
-
-		resetBoard();
-        disable(messageText);
-
-		if (playersTurn) {
-			playArea.style.background = 'darkRed';
-			heldArea.style.background = 'darkRed';
-			playerScore += roundTotal;
-			write(`Player's turn ended. Earned ${roundTotal} points.`, 'green');
-			disable(buttonRoll);
-			disable(buttonEnd);
-            playersTurn = false;
-			this.startCPUTurn();
-		} else {
-			playArea.style.background = 'black';
-			heldArea.style.background = 'black';
-			computerScore += roundTotal;
-			write(`CPU's turn ended. Earned ${roundTotal} points.`, 'red');
-			enable(buttonRoll);
-			disable(buttonEnd);
-            playersTurn = true;
-            this.startPlayerTurn();
-		}
-
-        roundTotal = 0;
-		this.updateScoreboard();
-
-        this.checkForWin();
-	}
-
-	// Method for the computer to move all scoring dice over to the held area
-	moveScoringGroups() {
-		console.log(`ScoringGroupsInPlay: ${scoringGroupsInPlay.length}`);
-		scoringGroupsInPlay.forEach((scoringGroup) => {
-			if (scoringGroup.type === 'Single') {
-				//console.log('CPU picks a single');
-				roundTotal += scoringGroup.value;
-				moveDie(scoringGroup.members[0].div);
-			} else {
-				scoringGroup.members.forEach((die) => {
-					moveDie(die.div);
-				});
-				roundTotal += scoringGroup.value;
-				//console.log(`CPU picks a group: ${scoringGroup.type}`);
-			}   
-		});
-	}
-
-    // If player 'busts' and doesn't roll any scoring die, enter this state
-    bust() {
-        write('BUSTED! No scoring dice rolled!', 'red-bold');
-        messageText.innerHTML='BUSTED!<br>No scoring dice rolled!<br>0 pts earned.';
-        enable(messageText);
-        roundTotal = 0;
-        playArea.style.background = 'red';
-        setTimeout(game.endTurn(), 2000); 
-        
-    }
-
-    checkForWin() {
-
-        // Player wins
-        if (playerScore >= scoreGoal) {
-            write(`You have reached ${scoreGoal} points.`, 'green');
-            write('YOU WIN!', 'bg-green');
-        }
-        // Computer wins
-        else if (computerScore >= scoreGoal) {
-            write(`CPU has reached ${scoreGoal} points.`, 'red');
-            write('YOU LOSE.', 'bg-red');
-        }
-    }
-}
-
 class ScoringGroup {
 	constructor(value, type, members) {
 		this.value = value;        // how many points the group as a whole is worth
@@ -225,22 +60,114 @@ class ScoringGroup {
 		this.members = members;    // dice that are members of this group
 	}
 }
+
+
+// Handles text styling and output
+class Text {
+
+	constructor() {}
+
+	clear() {
+		let allConsoleLines = document.querySelectorAll('.console-line');
+		let numberOfLines = allConsoleLines.length;
+		if (numberOfLines > 0) {
+			for (let i = 0; i < numberOfLines; i++) {
+				allConsoleLines[i].remove();
+			}
+		}
+
+		allConsoleLines = [];
+		allConsoleLines.length = 0;
+	}
+
+	write(msg, style) {
+		const newText = document.createTextNode(msg);
+		const newLine = document.createElement('p');
+
+		newLine.appendChild(newText);
+		consoleContainer.appendChild(newLine);
+		consoleLines.push(newLine);
+		newLine.classList.add('console-line');
+		newLine.innerText = msg;
+		let css;
+
+		switch (style) {
+			default:
+				css = 'color: gray;';
+				newLine.classList.add('gray');
+				break;
+			case 'red':
+				css = 'color: red; font-weight: bold;';
+				newLine.classList.add('red');
+				break;
+			case 'white':
+				css = 'color: white;';
+				newLine.classList.add('white');
+				break;
+			case 'cyan':
+				css = 'color: cyan; font-weight: bold;';
+				newLine.classList.add('cyan');
+				newLine.classList.add('bold');
+				break;
+			case 'bg-red':
+				css = 'background: red; color: white;';
+				newLine.classList.add('bg-red');
+				break;
+
+			case 'chartreuse':
+				css = 'color: chartreuse;';
+				newLine.classList.add('green');
+				break;
+
+			case 'bg-green':
+				css = 'background: chartreuse; color: black;';
+				newLine.classList.add('bg-green');
+				newLine.classList.add('black');
+				break;
+
+			case 'red-bold':
+				css = 'color: red; font-weight:bold';
+				newLine.classList.add('red');
+				newLine.classList.add('bold');
+				break;
+
+			case 'white-bold':
+				css = 'color: white; font-weight:bold';
+				newLine.classList.add('white');
+				newLine.classList.add('bold');
+				break;
+		}
+
+		if (printToConsole) {
+			console.log('%c ' + msg, css);
+		}
+
+		consoleContainer.scrollTop = consoleContainer.scrollHeight;
+	}
+}
 //#endregion
 
 // DECLARATIONS
 //#region [Blue]
 // Global variables
-const game = new Game();
+//const game = new Game();
+const text = new Text();
 const dice = [];
 const diceInPlay = [];
 const diceInHeld = [];
 const scoringGroupsInPlay = [];
+let consoleLines = [];
 let playersTurn = true;
+let busted = false;
 let roundTotal = 0;
 let playerScore = 0;
 let computerScore = 0;
+const scoreGoal = 5000;     // when a player reaches this score, they win
+const gameSpeed = 1000;       // delay in ms between cpu moves
+
 
 // Dev tools
+let printToConsole = true;   // print to dev console or not
 const useRiggedDice = false;
 const riggedDice = [1,2,3,4,5,6];
 
@@ -254,12 +181,13 @@ const roundText = document.querySelector('#round');
 const scoreText = document.querySelector('#score');
 const computerScoreText = document.querySelector('#computer-score');
 const messageText = document.querySelector('#message');
+const consoleContainer = document.querySelector('#console-container');
 
 // Print rules
-// write('DICE GAME RULES', 'bg-green');
+// text.write('DICE GAME RULES', 'bg-green');
 
 // Start game
-game.startPlayerTurn();
+startPlayerTurn();
 //#endregion
 
 // BUTTONS & EVENTS
@@ -286,14 +214,14 @@ playArea.addEventListener('click', (e) => {
 		roundTotal += targetDie.group.value;
 
 		console.log(`Player round total: ${roundTotal}`);
-		game.updateScoreboard();
+		updateScoreboard();
 	}
 });
 
 // ROLL BUTTON
 buttonRoll.addEventListener('click', (e) => {
 	e.preventDefault();
-    game.handleDiceThrow();
+    handleDiceThrow();
 
 });
 
@@ -301,201 +229,20 @@ buttonRoll.addEventListener('click', (e) => {
 // End turn, lock in your points
 buttonEnd.addEventListener('click', (e) => {
     e.preventDefault();
-    game.endTurn();
+    endTurn();
 })
 
 // COMPUTER TURN BUTTON
-runCPU.addEventListener('click', (e) => {
-    e.preventDefault();
-    game.cpuTurn();
-})
+// runCPU.addEventListener('click', (e) => {
+//     e.preventDefault();
+//     game.cpuTurn();
+// })
 //#endregion
-
-// SORTING & PATTERN RECOGNITION
-//#region [Purple]
-// Checks the dice in the playing area for dice that are worth points
-function checkScoring() {
-
-	// Make an object of arrays to hold our dice sorted by their rolled values
-	const sorted = {
-		ones: [],
-		twos: [],
-		threes: [],
-		fours: [],
-		fives: [],
-		sixes: [],
-	};
-
-	diceInPlay.forEach((die) => {
-		// take inventory of how many of each number there are
-		switch (die.faceValue) {
-			case 1:
-				sorted.ones.push(die);
-				break;
-
-			case 2:
-				sorted.twos.push(die);
-				break;
-
-			case 3:
-				sorted.threes.push(die);
-				break;
-			case 4:
-				sorted.fours.push(die);
-				break;
-
-			case 5:
-				sorted.fives.push(die);
-				break;
-
-			case 6:
-				sorted.sixes.push(die);
-				break;
-		}
-	});
-	
-    // PATTERN RECOGNITION and ASSIGNING GROUPS
-
-    // THREE OR MORE OF A KIND
-	// Iterate through Sorted object's properties (the arrays sorted by dice face value)
-    // 'Sorted' is an object with this format-- { ones: [], twos: [], etc }
-	Object.entries(sorted).forEach((entry) => {
-		// Iterate through the sorted arrays
-		if (entry[1].length >= 3) {
-
-            // Make an empty scoring group to assign values to to describe this group of dice
-
-            // TODO: Make a function out of this called assignScoringGroup
-            const thisGroup = new ScoringGroup(0, '', []);
-            scoringGroupsInPlay.push(thisGroup);    //'register' this group
-            console.log(`Registered scoring group ${thisGroup}`);
-
-			entry[1].forEach((die) => {
-
-				die.scoring = true;
-				die.div.classList.add('scoring-group');
-
-                // Assign values to the scoring group
-                thisGroup.members.push(die);
-                const typeText = `${entry[1].length} ${entry[0]}`;
-                thisGroup.type = typeText;
-                thisGroup.value = ofAKindValue(entry[1]);
-                // give each die a reference to the group it's in
-                die.group = thisGroup;
-			});
-            //console.log(`Rolled ${entry[1].length} ${entry[0]}!`);
-		}
-	});
-
-    // STRAIGHTS
-    // TODO: DRY THIS UP, consolidate into one function
-    const one = getDieByFaceValue(1);
-    const two = getDieByFaceValue(2);
-    const three = getDieByFaceValue(3);
-    const four = getDieByFaceValue(4);
-    const five = getDieByFaceValue(5);
-    const six = getDieByFaceValue(6);
-
-    if (two && three && four && five) {
-        if (one && six) {
-        const thisGroup = new ScoringGroup(0, '', []);
-        scoringGroupsInPlay.push(thisGroup);  
-        console.log(`Registered scoring group ${thisGroup}`);
-            const array = [one, two, three, four, five, six];
-            array.forEach((die) => {
-							die.scoring = true;
-							die.div.classList.add('scoring-straight');
-							// Assign values to the scoring group
-							thisGroup.members.push(die);
-							thisGroup.type = 'Full Straight';
-							thisGroup.value = 1500;
-							// give each die a reference to the group it's in
-							die.group = thisGroup;
-						});
-                        write(`Got ${thisGroup.type}`,'white-bold');
-
-        } else if (one) {
-        const thisGroup = new ScoringGroup(0, '', []);
-        scoringGroupsInPlay.push(thisGroup);   
-        console.log(`Registered scoring group ${thisGroup}`);
-            const array = [one, two, three, four, five];
-            array.forEach((die) => {
-							die.scoring = true;
-							die.div.classList.add('scoring-straight');
-							thisGroup.members.push(die);
-							thisGroup.type = 'Partial Straight 1-5';
-							thisGroup.value = 500;
-							die.group = thisGroup;
-						});
-                        write(`Got ${thisGroup.type}`, 'white-bold');
-        } else if (six) {
-        const thisGroup = new ScoringGroup(0, '', []);
-        scoringGroupsInPlay.push(thisGroup);   
-        console.log(`Registered scoring group ${thisGroup}`);
-            const array = [two, three, four, five, six];
-            array.forEach((die) => {
-							die.scoring = true;
-							die.div.classList.add('scoring-straight');
-							thisGroup.members.push(die);
-							thisGroup.type = 'Partial Straight 2-6';
-							thisGroup.value = 750;
-							die.group = thisGroup;
-						});
-                        write(`Got ${thisGroup.type}`, 'white-bold');
-        }
-    }
-
-    // SINGLE DICE
-	// Check for single 1's
-	if (sorted.ones.length > 0 && sorted.ones.length < 3) {
-		sorted.ones.forEach((die) => {
-			if (die.group.type === 'None') {
-                const thisGroup = new ScoringGroup(0, '', []);
-				thisGroup.value = 100;
-				thisGroup.type = 'Single 1';
-				thisGroup.members.push(die);
-                scoringGroupsInPlay.push(thisGroup);    
-                console.log(`Registered scoring group ${thisGroup.type}`);
-				die.group = thisGroup;
-				die.scoring = true;
-				die.div.classList.add('scoring-solo');
-                write(`Got ${thisGroup.type}`, 'white-bold');
-			}
-		});
-
-	}
-	// Check for single 5's
-	if (sorted.fives.length > 0 && sorted.fives.length < 3) {
-
-		sorted.fives.forEach((die) => {
-			if (die.group.type === 'None') {
-                const thisGroup = new ScoringGroup(0, '', []);
-				thisGroup.value = 50;
-				thisGroup.type = 'Single 5';
-				thisGroup.members.push(die);
-                scoringGroupsInPlay.push(thisGroup);   
-                console.log(`Registered scoring group ${thisGroup.type}`);
-				die.group = thisGroup;
-				die.scoring = true;
-				die.div.classList.add('scoring-solo');
-                write(`Got ${thisGroup.type}`, 'white-bold');
-			}
-		});
-  	}
-
-	updateDiceUI();
-
-	// If no scoring dice were produced during the roll, end turn and gain 0 points 
-	if (!anyScoring(diceInPlay)) {
-		game.bust();
-	}
-}
-	//#endregion
 
 // CALCULATE "OF-A-KIND" VALUES
 //#region [DarkGray]
 function ofAKindValue(dice) {
-// TODO: DRY this up! consolidate conditionals, write generic formula to arrive at end value
+// TODO: DRY this up! consolidate conditionals, text.write generic formula to arrive at end value
 
     // Check for multiple 1's first bc they have higher point values
 	// Check for other 'of-a-kind's
@@ -654,48 +401,5 @@ function enable(element) {
 function disable(element) {
 	element.classList.add('disabled');
 }
-// Print styled text to the console
-// TODO: allow this to accept multiple css 'classes' as arguments
-function write(text, style) {
-	let css = '';
-	switch (style) {
-		case 'red':
-			css = 'color: red;';
-			break;
 
-		case 'bg-red':
-			css = 'background: red; color: white';
-			break;
-
-		case 'green':
-			css = 'color: chartreuse;';
-			break;
-
-		case 'bg-green':
-			css = 'background: chartreuse; color: black';
-			break;
-
-		case 'blue':
-			css = 'color: cyan;';
-			break;
-
-		// case 'pink':
-		// 	css = 'color: magenta;';
-		// 	break;
-
-		// case 'purple':
-		// 	css = 'color: purple;';
-		// 	break;
-
-		case 'red-bold':
-			css = 'color: red; font-weight:bold';
-			break;
-
-		case 'white-bold':
-			css = 'color: white; font-weight:bold';
-			break;
-	}
-
-	console.log(`%c${text}`, css);
-}
 //#endregion
