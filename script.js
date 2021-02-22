@@ -144,7 +144,9 @@ class Game {
 	}
 
 	endTurn() {
+
 		resetBoard();
+        disable(messageText);
 
 		if (playersTurn) {
 			playArea.style.background = 'darkRed';
@@ -168,6 +170,8 @@ class Game {
 
         roundTotal = 0;
 		this.updateScoreboard();
+
+        this.checkForWin();
 	}
 
 	// Method for the computer to move all scoring dice over to the held area
@@ -184,9 +188,34 @@ class Game {
 				});
 				roundTotal += scoringGroup.value;
 				//console.log(`CPU picks a group: ${scoringGroup.type}`);
-			}
+			}   
 		});
 	}
+
+    // If player 'busts' and doesn't roll any scoring die, enter this state
+    bust() {
+        write('BUSTED! No scoring dice rolled!', 'red-bold');
+        messageText.innerHTML='BUSTED!<br>No scoring dice rolled!<br>0 pts earned.';
+        enable(messageText);
+        roundTotal = 0;
+        playArea.style.background = 'red';
+        setTimeout(game.endTurn(), 2000); 
+        
+    }
+
+    checkForWin() {
+
+        // Player wins
+        if (playerScore >= scoreGoal) {
+            write(`You have reached ${scoreGoal} points.`, 'green');
+            write('YOU WIN!', 'bg-green');
+        }
+        // Computer wins
+        else if (computerScore >= scoreGoal) {
+            write(`CPU has reached ${scoreGoal} points.`, 'red');
+            write('YOU LOSE.', 'bg-red');
+        }
+    }
 }
 
 class ScoringGroup {
@@ -224,6 +253,7 @@ const runCPU = document.querySelector('#button-runCPU');
 const roundText = document.querySelector('#round');
 const scoreText = document.querySelector('#score');
 const computerScoreText = document.querySelector('#computer-score');
+const messageText = document.querySelector('#message');
 
 // Print rules
 // write('DICE GAME RULES', 'bg-green');
@@ -457,9 +487,7 @@ function checkScoring() {
 
 	// If no scoring dice were produced during the roll, end turn and gain 0 points 
 	if (!anyScoring(diceInPlay)) {
-		write('BUST! No scoring dice rolled!', 'red-bold');
-        roundTotal = 0;
-        game.endTurn();
+		game.bust();
 	}
 }
 	//#endregion

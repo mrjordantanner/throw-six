@@ -62,7 +62,7 @@ a {
 
 #held-area {
     background: black;
-    flex: 1;
+    flex: 1.2;
     border: 4px solid orange;
 }
 
@@ -181,6 +181,16 @@ a {
     position: absolute;
     bottom: 75px;
     left: 250px;
+}
+
+#message {
+    display:block;
+    position: absolute;
+    bottom: 150px;
+    right: 120px;
+    color:white;
+    font-size: 48px;
+    text-align: center;
 }
 
 
