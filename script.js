@@ -55,7 +55,7 @@ class Game {
 	throw(num) {
 		dice.length = 0;
 		// Create num dice in play area
-		console.log(`Throwing ${num} dice`);
+		write(`Throwing ${num} dice`, 'blue');
 		for (let i = 0; i < num; i++) {
 			const newDie = new Die();
 			// Manually set the dice value for testing
@@ -69,22 +69,30 @@ class Game {
 		}
 	}
 
+	startPlayerTurn() {
+		playersTurn = true;
+		write("== Start of Player's turn", 'bg-green');
+	}
+
+    startCPUTurn() {
+        write("== Start of CPU's turn", 'bg-red');
+        disable(buttonRoll);
+        disable(buttonEnd);
+        this.cpuTurn();
+    }
+
 	// Control computer's turn
 	cpuTurn() {
-		console.log("== Start of CPU's turn");
-		disable(buttonRoll);
-		disable(buttonEnd);
-
-		// throw dice, checkScoring, and updateScoreboard
-		this.handleDiceThrow();
+        // throw dice, checkScoring, and updateScoreboard
+        this.handleDiceThrow();
         // Get all scoring dice and move them to held area
-		this.moveScoringGroups();
+        this.moveScoringGroups();
 
-		console.log(`CPU Round total: ${computerRoundTotal}`);
-
+		console.log(`CPU Round total: ${roundTotal}`);
+        //console.log(`diceInPlay.length: ${diceInPlay.length}`);
 		// Check remaining dice, if more than 2, roll again
 		if (diceInPlay.length > 2) {
-			this.handleDiceThrow();
+            this.cpuTurn();
 		}
 		// Otherwise end turn
 		else {
@@ -93,26 +101,19 @@ class Game {
 	}
 
 	handleDiceThrow() {
-		// Disable roll button so player cant roll again
-		// Button is re-enabled when they move a die to the held area
+
 		if (playersTurn) {
 			disable(buttonRoll);
 		}
-		const remainingDice = diceInPlay.length;
 
+        const remainingDice = diceInPlay.length;
 		clearPlayArea();
 
-		// If we've held 0 dice, throw 6 die, otherwise throw remaining dice already on board
-		console.log(`DiceinHeld: ${diceInHeld.length}`);
-
+        // First turn throw 6 dice, otherwise throw remaining dice
 		if (diceInHeld.length === 0) {
 			game.throw(6);
 		} else {
 			game.throw(remainingDice);
-		}
-
-		if (playersTurn && diceInPlay.length === 6) {
-			disable(buttonRoll);
 		}
 
 		checkScoring();
@@ -122,9 +123,9 @@ class Game {
 
 	updateScoreboard() {
 		if (playersTurn) {
-			roundText.innerText = playerRoundTotal;
+			roundText.innerText = roundTotal;
 		} else {
-			roundText.innerText = computerRoundTotal;
+			roundText.innerText = roundTotal;
 		}
 
 		scoreText.innerText = playerScore;
@@ -137,42 +138,41 @@ class Game {
 		if (playersTurn) {
 			playArea.style.background = 'darkRed';
 			heldArea.style.background = 'darkRed';
-			playerScore += playerRoundTotal;
-			console.log(`Player's turn ended. Earned ${playerRoundTotal} points.`);
-			playerRoundTotal = 0;
-			enable(buttonRoll);
+			playerScore += roundTotal;
+			write(`Player's turn ended. Earned ${roundTotal} points.`, 'green');
+			roundTotal = 0;
+			disable(buttonRoll);
 			disable(buttonEnd);
-			playersTurn = false;
-			this.cpuTurn();
+            playersTurn = false;
+			this.startCPUTurn();
 		} else {
 			playArea.style.background = 'black';
 			heldArea.style.background = 'black';
-			computerScore += computerRoundTotal;
-			console.log(`CPU's turn ended. Earned ${computerRoundTotal} points.`);
-			computerRoundTotal = 0;
+			computerScore += roundTotal;
+			write(`CPU's turn ended. Earned ${roundTotal} points.`, 'red');
+			roundTotal = 0;
 			enable(buttonRoll);
 			disable(buttonEnd);
-
-			playersTurn = true;
-			console.log("== Start of Player's turn");
+            playersTurn = true;
+            this.startPlayerTurn();
 		}
 
 		this.updateScoreboard();
 	}
 
+	// Method for the computer to move all scoring dice over to the held area
 	moveScoringGroups() {
-		// Get all scoring dice and move them to held area
 		console.log(`ScoringGroupsInPlay: ${scoringGroupsInPlay.length}`);
 		scoringGroupsInPlay.forEach((scoringGroup) => {
 			if (scoringGroup.type === 'Single') {
 				console.log('CPU picks a single');
-				computerRoundTotal += scoringGroup.value;
+				roundTotal += scoringGroup.value;
 				moveDie(scoringGroup.members[0].div);
 			} else {
 				scoringGroup.members.forEach((die) => {
 					moveDie(die.div);
 				});
-				computerRoundTotal += scoringGroup.value;
+				roundTotal += scoringGroup.value;
 				console.log(`CPU picks a group: ${scoringGroup.type}`);
 			}
 		});
@@ -197,14 +197,13 @@ const diceInPlay = [];
 const diceInHeld = [];
 const scoringGroupsInPlay = [];
 let playersTurn = true;
-let playerRoundTotal = 0;
+let roundTotal = 0;
 let playerScore = 0;
-let computerRoundTotal = 0;
 let computerScore = 0;
 
 // Dev tools
 const useRiggedDice = false;
-const riggedDice = [5,3,2,2,4,6];
+const riggedDice = [1,2,2,3,3,6];
 
 // Element references
 const playArea = document.querySelector('#play-area');
@@ -215,9 +214,13 @@ const runCPU = document.querySelector('#button-runCPU');
 const roundText = document.querySelector('#round');
 const scoreText = document.querySelector('#score');
 const computerScoreText = document.querySelector('#computer-score');
+
+// Start game
+game.startPlayerTurn();
 //#endregion
 
-// EVENTS
+
+// BUTTONS & EVENTS
 //#region [Blue]
 // CLICK ON DICE IN PLAY AREA
 playArea.addEventListener('click', (e) => {
@@ -238,9 +241,9 @@ playArea.addEventListener('click', (e) => {
 			});
 		}
         // Add total point value of dice held to running total for the round 
-		playerRoundTotal += targetDie.group.value;
+		roundTotal += targetDie.group.value;
 
-		console.log(`Player round total: ${playerRoundTotal}`);
+		console.log(`Player round total: ${roundTotal}`);
 		game.updateScoreboard();
 	}
 });
@@ -460,16 +463,16 @@ function checkScoring() {
 	// If no scoring dice were produced during the roll, end turn and gain 0 points 
 	if (!anyScoring(diceInPlay)) {
 		console.log('NO SCORING DICE ROLLED!');
+        roundScore = 0;
         game.endTurn();
 	}
 }
 	//#endregion
 
-// TODO: DRY this up! consolidate conditionals, write generic formula to arrive at end value
-//#region [Gray]
-// CALCULATE VALUES of the different pattern types
-// Of A Kind
+// CALCULATE "OF-A-KIND" VALUES
+//#region [DarkGray]
 function ofAKindValue(dice) {
+// TODO: DRY this up! consolidate conditionals, write generic formula to arrive at end value
 
     // Check for multiple 1's first bc they have higher point values
 	// Check for other 'of-a-kind's
@@ -507,38 +510,10 @@ function ofAKindValue(dice) {
 			break;
 	}
 }
-
-// Straights
-// function straightsValue() {
-
-
-//     // get die by facevalue
-//     // use to check if it exists, also to
-
-
-//     if (anyInPlay(2) && anyInPlay(3) && anyInPlay(4) && anyInPlay(5)) {
-//         if (anyInPlay(1) && anyInPlay(6)) {
-//             // full straight
-//             console.log('Full Straight');
-//             return 1500;
-//         } else if (anyInPlay(1)) {
-//             // low partial straight
-//             console.log('Low Partial Straight');
-//             return 500;
-//         } else if (anyInPlay(6)) {
-//             // high partial straight
-//             console.log('High Partial Straight');
-//             return 750;
-//         }
-//     }
-//     return 0;
-// }
-
-
 //#endregion
 
-
 // FUNCTIONS
+//#region [DarkGray]
 // TODO: move this to Game class
 // 'moves' the die and re-appends its corresponding div to playArea (or heldArea)
 function moveDie(div) {
@@ -559,12 +534,6 @@ function moveDie(div) {
             disable(buttonRoll);
         }
 	}
-	// Moving dice out of held area
-	// else
-	// {
-	//     playArea.appendChild(die);
-	//     die.held = false;
-	// }
 }
 
 function updateDiceUI() {
@@ -662,5 +631,40 @@ function enable(element) {
 function disable(element) {
 	element.classList.add('disabled');
 }
+// Print styled text to the console
+// TODO: allow this to accept multiple css 'classes' as arguments
+function write(text, style) {
+	let css = '';
+	switch (style) {
+		case 'red':
+			css = 'color: red;';
+			break;
 
+		case 'bg-red':
+			css = 'background: red; color: white';
+			break;
+
+		case 'green':
+			css = 'color: chartreuse;';
+			break;
+
+		case 'bg-green':
+			css = 'background: chartreuse; color: black';
+			break;
+
+		case 'blue':
+			css = 'color: cyan;';
+			break;
+
+		case 'pink':
+			css = 'color: magenta;';
+			break;
+
+		case 'purple':
+			css = 'color: purple;';
+			break;
+	}
+
+	console.log(`%c${text}`, css);
+}
 //#endregion
