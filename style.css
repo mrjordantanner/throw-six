@@ -8,10 +8,11 @@ body {
     background: #222222;
     color: antiquewhite;
     font-family: Arial, Helvetica, sans-serif;
+    font-size: 20px;
 }
 
 h1 {
-    font-size: 36px;
+    font-size: 30px;
 }
 
 a {
@@ -70,6 +71,7 @@ a {
 .die {
     /* position: relative; */
     display: flex;
+    flex-direction: column;
     height: 150px;
     width: 150px; 
     border: solid 1px red;
@@ -88,18 +90,24 @@ a {
 .die:hover {
     border: 3px white solid;
 }
-/* 
-.die:active {
-    background: white;
-} */
 
-/* .die .ui {
+.die .face-value {
+    color: white;
+    font-size: 50px;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-weight: bold;
+    pointer-events: none;
+    
+}
+
+.die .point-value {
     color: yellow;
     font-size: 30px;
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    font-weight: bold;;
+    font-weight: bold;
+    pointer-events: none;
     
-} */
+}
 
 .die:hover {
     border: orange solid 1px;
@@ -129,34 +137,55 @@ a {
 
 
 
-
-
 /* Text */
-
 #score {
     display:block;
     position: absolute;
-    bottom: 10px;
-    right: 100px;
+    bottom: 50px;
+    right: 50px;
+}
+
+#label-score {
+    display:block;
+    position: absolute;
+    bottom: 85px;
+    right: 50px;
 }
 
 #computer-score {
     display:block;
     position: absolute;
-    bottom: 50px;
-    right: 100px;
+    bottom: 10px;
+    right: 50px;
+    color:red;
+}
+
+#label-computer-score {
+    display:block;
+    position: absolute;
+    bottom: 40px;
+    right: 50px;
     color:red;
 }
 
 #round {
     display:block;
     position: absolute;
-    bottom: 20px;
-    left: 350px;
+    bottom: 0px;
+    left: 300px;
+    font-size: 48px;
 }
 
-/* Buttons  */
+#label-round {
+    display:block;
+    position: absolute;
+    bottom: 75px;
+    left: 250px;
+}
 
+
+
+/* Buttons  */
 a.button {
     display: flex;
     align-items: center;

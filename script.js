@@ -1,5 +1,5 @@
-// DICE GAME RULES ***
-//region [Gray]
+// DICE GAME RULES
+//#region [DarkGray]
 // a single 1 is worth 100 points;
 // a single 5 is worth 50 points;
 // three of a kind is worth 100 points multiplied by the given number, e.g. three 4s are worth 400 points;
@@ -11,49 +11,55 @@
 //#endregion
 
 // CLASSES
-//#region [Gray]
+//#region [Violet]
 // Creates Die objects for use in play
 class Die {
-	constructor(faceValue, div, held = false, scoring = false, group, ui) {
+	constructor(faceValue, div, held = false, scoring = false, group, uiFaceValue, uiPointValue) {
 		this.faceValue = faceValue; // the rolled value of the die
 		this.div = div; // reference to visual element in window
 		this.held = held; // bool, is die in the held area?
 		this.scoring = scoring; // bool, is die currently worth any points?
 		this.group = group; // reference to the scoringGroup this die is in, if any
-        this.ui = ui;
+        this.uiFaceValue = uiFaceValue;
+        this.uiPointValue = uiPointValue;
 
+        // Create div element to represent the die on screen
 		this.div = document.createElement('div');
 		this.div.classList.add('die');
 
+        // Assign random face value to die, 1-6
 		const val = Math.floor(Math.random() * 6 + 1);
 		this.faceValue = val;
 		
-        // Assign default values for scoringGroup that will be overriden when actually in a group
+        // Assign default values for scoringGroup that will later be overidden
 		this.group = new ScoringGroup(0, 'None', []);
 
         // create UI element and append as child
-        // ui = document.createElement('h1');
-        // ui.classList.add('ui');
-        // this.div.appendChild(ui);
+        this.uiFaceValue = document.createElement('div');
+        this.uiPointValue = document.createElement('div');
+        this.uiFaceValue.classList.add('face-value');
+        this.uiPointValue.classList.add('point-value');
+        this.div.appendChild(this.uiFaceValue);
+        this.div.appendChild(this.uiPointValue);
+
+        this.updateUI();
         
 	}
 
     // updates text on the die for testing
 	updateUI() {
-        // ui.innerText = this.faceValue;
-		 this.div.innerText = this.faceValue;
+        this.uiFaceValue.innerText = this.faceValue;
+        this.uiPointValue.innerText = this.group.value;
 	}
 }
 
-//#endregion
-
-//#region [Violet]
 // Controls game flow and functions
 class Game {
 	constructor() {}
 
 	throw(num) {
 		dice.length = 0;
+        let rolledMessage = `Rolled `;
 		// Create num dice in play area
 		write(`Throwing ${num} dice`, 'blue');
 		for (let i = 0; i < num; i++) {
@@ -61,12 +67,14 @@ class Game {
 			// Manually set the dice value for testing
 			if (useRiggedDice) {
 				newDie.faceValue = riggedDice[i];
-			}
-			//console.log(`Rolled ${newDie.faceValue}`);
+ 			}
+            rolledMessage += newDie.faceValue.toString() + ' ';
 			dice.push(newDie);
 			diceInPlay.push(newDie);
 			playArea.appendChild(newDie.div);
 		}
+        
+        write(rolledMessage, 'white-bold');
 	}
 
 	startPlayerTurn() {
@@ -83,6 +91,9 @@ class Game {
 
 	// Control computer's turn
 	cpuTurn() {
+
+        // TODO: setInterval here for cpu turn delay
+
         // throw dice, checkScoring, and updateScoreboard
         this.handleDiceThrow();
         // Get all scoring dice and move them to held area
@@ -140,7 +151,6 @@ class Game {
 			heldArea.style.background = 'darkRed';
 			playerScore += roundTotal;
 			write(`Player's turn ended. Earned ${roundTotal} points.`, 'green');
-			roundTotal = 0;
 			disable(buttonRoll);
 			disable(buttonEnd);
             playersTurn = false;
@@ -150,13 +160,13 @@ class Game {
 			heldArea.style.background = 'black';
 			computerScore += roundTotal;
 			write(`CPU's turn ended. Earned ${roundTotal} points.`, 'red');
-			roundTotal = 0;
 			enable(buttonRoll);
 			disable(buttonEnd);
             playersTurn = true;
             this.startPlayerTurn();
 		}
 
+        roundTotal = 0;
 		this.updateScoreboard();
 	}
 
@@ -165,7 +175,7 @@ class Game {
 		console.log(`ScoringGroupsInPlay: ${scoringGroupsInPlay.length}`);
 		scoringGroupsInPlay.forEach((scoringGroup) => {
 			if (scoringGroup.type === 'Single') {
-				console.log('CPU picks a single');
+				//console.log('CPU picks a single');
 				roundTotal += scoringGroup.value;
 				moveDie(scoringGroup.members[0].div);
 			} else {
@@ -173,7 +183,7 @@ class Game {
 					moveDie(die.div);
 				});
 				roundTotal += scoringGroup.value;
-				console.log(`CPU picks a group: ${scoringGroup.type}`);
+				//console.log(`CPU picks a group: ${scoringGroup.type}`);
 			}
 		});
 	}
@@ -203,7 +213,7 @@ let computerScore = 0;
 
 // Dev tools
 const useRiggedDice = false;
-const riggedDice = [1,2,2,3,3,6];
+const riggedDice = [1,2,3,4,5,6];
 
 // Element references
 const playArea = document.querySelector('#play-area');
@@ -215,10 +225,12 @@ const roundText = document.querySelector('#round');
 const scoreText = document.querySelector('#score');
 const computerScoreText = document.querySelector('#computer-score');
 
+// Print rules
+// write('DICE GAME RULES', 'bg-green');
+
 // Start game
 game.startPlayerTurn();
 //#endregion
-
 
 // BUTTONS & EVENTS
 //#region [Blue]
@@ -267,11 +279,10 @@ runCPU.addEventListener('click', (e) => {
     e.preventDefault();
     game.cpuTurn();
 })
-
 //#endregion
 
 // SORTING & PATTERN RECOGNITION
-	//#region [Purple]
+//#region [Purple]
 // Checks the dice in the playing area for dice that are worth points
 function checkScoring() {
 
@@ -356,19 +367,14 @@ function checkScoring() {
     const six = getDieByFaceValue(6);
 
     if (two && three && four && five) {
-
         if (one && six) {
-
         const thisGroup = new ScoringGroup(0, '', []);
-        scoringGroupsInPlay.push(thisGroup);    //'register' this group
+        scoringGroupsInPlay.push(thisGroup);  
         console.log(`Registered scoring group ${thisGroup}`);
-            console.log('Full Straight');
             const array = [one, two, three, four, five, six];
             array.forEach((die) => {
-							// we can use main array since all 6 die required
 							die.scoring = true;
 							die.div.classList.add('scoring-straight');
-
 							// Assign values to the scoring group
 							thisGroup.members.push(die);
 							thisGroup.type = 'Full Straight';
@@ -376,64 +382,54 @@ function checkScoring() {
 							// give each die a reference to the group it's in
 							die.group = thisGroup;
 						});
+                        write(`Got ${thisGroup.type}`,'white-bold');
 
         } else if (one) {
-
         const thisGroup = new ScoringGroup(0, '', []);
-        scoringGroupsInPlay.push(thisGroup);    //'register' this group
+        scoringGroupsInPlay.push(thisGroup);   
         console.log(`Registered scoring group ${thisGroup}`);
-            console.log('Partial Straight 1-5');
             const array = [one, two, three, four, five];
             array.forEach((die) => {
 							die.scoring = true;
 							die.div.classList.add('scoring-straight');
-
-							// Assign values to the scoring group
 							thisGroup.members.push(die);
 							thisGroup.type = 'Partial Straight 1-5';
 							thisGroup.value = 500;
-    						// give each die a reference to the group it's in
 							die.group = thisGroup;
 						});
-
+                        write(`Got ${thisGroup.type}`, 'white-bold');
         } else if (six) {
-
         const thisGroup = new ScoringGroup(0, '', []);
-        scoringGroupsInPlay.push(thisGroup);    //'register' this group
+        scoringGroupsInPlay.push(thisGroup);   
         console.log(`Registered scoring group ${thisGroup}`);
-            console.log('Partial Straight 2-6');
             const array = [two, three, four, five, six];
             array.forEach((die) => {
 							die.scoring = true;
 							die.div.classList.add('scoring-straight');
-
-							// Assign values to the scoring group
 							thisGroup.members.push(die);
 							thisGroup.type = 'Partial Straight 2-6';
 							thisGroup.value = 750;
-							// give each die a reference to the group it's in
 							die.group = thisGroup;
 						});
+                        write(`Got ${thisGroup.type}`, 'white-bold');
         }
     }
 
     // SINGLE DICE
 	// Check for single 1's
 	if (sorted.ones.length > 0 && sorted.ones.length < 3) {
-
 		sorted.ones.forEach((die) => {
 			if (die.group.type === 'None') {
                 const thisGroup = new ScoringGroup(0, '', []);
-
 				thisGroup.value = 100;
 				thisGroup.type = 'Single 1';
 				thisGroup.members.push(die);
-                scoringGroupsInPlay.push(thisGroup);    //'register' this group
+                scoringGroupsInPlay.push(thisGroup);    
                 console.log(`Registered scoring group ${thisGroup.type}`);
-
 				die.group = thisGroup;
 				die.scoring = true;
 				die.div.classList.add('scoring-solo');
+                write(`Got ${thisGroup.type}`, 'white-bold');
 			}
 		});
 
@@ -444,16 +440,15 @@ function checkScoring() {
 		sorted.fives.forEach((die) => {
 			if (die.group.type === 'None') {
                 const thisGroup = new ScoringGroup(0, '', []);
-
 				thisGroup.value = 50;
 				thisGroup.type = 'Single 5';
 				thisGroup.members.push(die);
-                scoringGroupsInPlay.push(thisGroup);    //'register' this group
+                scoringGroupsInPlay.push(thisGroup);   
                 console.log(`Registered scoring group ${thisGroup.type}`);
-
 				die.group = thisGroup;
 				die.scoring = true;
 				die.div.classList.add('scoring-solo');
+                write(`Got ${thisGroup.type}`, 'white-bold');
 			}
 		});
   	}
@@ -462,8 +457,8 @@ function checkScoring() {
 
 	// If no scoring dice were produced during the roll, end turn and gain 0 points 
 	if (!anyScoring(diceInPlay)) {
-		console.log('NO SCORING DICE ROLLED!');
-        roundScore = 0;
+		write('BUST! No scoring dice rolled!', 'red-bold');
+        roundTotal = 0;
         game.endTurn();
 	}
 }
@@ -656,12 +651,20 @@ function write(text, style) {
 			css = 'color: cyan;';
 			break;
 
-		case 'pink':
-			css = 'color: magenta;';
+		// case 'pink':
+		// 	css = 'color: magenta;';
+		// 	break;
+
+		// case 'purple':
+		// 	css = 'color: purple;';
+		// 	break;
+
+		case 'red-bold':
+			css = 'color: red; font-weight:bold';
 			break;
 
-		case 'purple':
-			css = 'color: purple;';
+		case 'white-bold':
+			css = 'color: white; font-weight:bold';
 			break;
 	}
 
