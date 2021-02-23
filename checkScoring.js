@@ -1,6 +1,6 @@
 //#region [Purple]
 function checkScoring() {
-
+	console.log('4 - checkScoring');
 	// Make an object of arrays to hold our dice sorted by their rolled values
 	const sorted = {
 		ones: [],

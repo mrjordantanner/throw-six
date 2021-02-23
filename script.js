@@ -76,7 +76,7 @@ let busted = false;
 let roundTotal = 0;
 let playerScore = 0;
 let computerScore = 0;
-const scoreGoal = 5000;     // when a player reaches this score, they win
+const scoreGoal = 2000;     // when a player reaches this score, they win
 const gameSpeed = 1000;       // delay in ms between cpu moves
 
 // Dev tools
@@ -134,6 +134,7 @@ playArea.addEventListener('click', (e) => {
 // ROLL BUTTON
 buttonRoll.addEventListener('click', (e) => {
 	e.preventDefault();
+	disable(buttonRoll);
     handleDiceThrow();
 
 });

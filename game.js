@@ -4,6 +4,7 @@
 
 // Create and 'throw' num dice
 function throwDice(num) {
+    console.log('3 - throwDice');
 	dice.length = 0;
 	let rolledMessage = `Rolled `;
 	// Create num dice in play area
@@ -35,39 +36,47 @@ function startCPUTurn() {
 	text.write("== Start of CPU's turn", 'bg-red');
 	disable(buttonRoll);
 	disable(buttonEnd);
-	// setTimeout(game.cpuTurn(), 1000);
-	cpuTurn();
+	setTimeout(cpuTurn, gameSpeed);
+	console.log('1 - startCpuTurn');
 }
 
 // Control computer's turn
 function cpuTurn() {
-
+	console.log('2 - cpuTurn');
 // Handle dice throw
     const remainingDice = diceInPlay.length;
 	clearPlayArea();
 
 	// First turn throw 6 dice, otherwise throw remaining dice
 	if (diceInHeld.length === 0) {
-		throwDice(6);
+        //setTimeout(function(){ throwDice(6); }, gameSpeed);
+        throwDice(6);
 	} else {
-		throwDice(remainingDice);
+       // setTimeout(function(){ throwDice(remainingDice); }, gameSpeed);
+        throwDice(remainingDice);
 	}
 
-	checkScoring();
+    checkScoring();
     if (busted) {
         roundTotal = 0;
-        return endTurn();
+        setTimeout(endTurn, gameSpeed);
+        return;
     }
 	updateDiceUI();
 	updateScoreboard();
 ////
-    moveScoringGroups();
+    setTimeout(moveScoringGroups, gameSpeed);
+    //moveScoringGroups();
   
-  	if (diceInPlay.length > 2) {
-		cpuTurn();
-	} else {
-		endTurn();
-	}
+  	// if (diceInPlay.length > 2) {
+	// 	//cpuTurn();
+    //     setTimeout(cpuTurn, gameSpeed);
+
+	// } else {
+	// 	//endTurn();
+    //     setTimeout(endTurn, gameSpeed);
+
+	// }
 }
 
 // Called on player turns from the roll button
@@ -75,6 +84,8 @@ function cpuTurn() {
 function handleDiceThrow() {
 
 	disable(buttonRoll);
+    disable(buttonEnd);
+
 	const remainingDice = diceInPlay.length;
 	clearPlayArea();
 
@@ -88,11 +99,16 @@ function handleDiceThrow() {
 	checkScoring();
 	updateDiceUI();
 	updateScoreboard();
+
+    if (busted) {
+        enable(buttonEnd);
+    }
 }
 
 // Called on computer turn
 // Method for the computer to move all scoring dice over to the held area
 function moveScoringGroups() {
+    console.log('4A - moveScoringGroups');
 	console.log(`MovingScoringGroups: ${scoringGroupsInPlay.length}`);
 	scoringGroupsInPlay.forEach((scoringGroup) => {
 		if (scoringGroup.type === 'Single') {
@@ -107,9 +123,19 @@ function moveScoringGroups() {
 			console.log(`CPU picks a group: ${scoringGroup.type}`);
 		}
 	});
+
+    if (diceInPlay.length > 2) {
+		//cpuTurn();
+        setTimeout(cpuTurn, gameSpeed);
+
+	} else {
+		//endTurn();
+        setTimeout(endTurn, gameSpeed);
+	}
 }
 
 function endTurn() {
+    console.log('4B - endTurn');
 	resetBoard();
 	disable(messageText);
 
@@ -130,7 +156,7 @@ function endTurn() {
 		text.write(`CPU ended their turn.`, 'red');
 		text.write(`Earned ${roundTotal} points.`, 'red');
 		enable(buttonRoll);
-		disable(buttonEnd);
+		// disable(buttonEnd);
 		roundTotal = 0;
 		startPlayerTurn();
 	}
