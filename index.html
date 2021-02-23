@@ -6,12 +6,37 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link rel="stylesheet" href="style.css">
+
+    <style>
+        .draggable { width: 90px; height: 90px; padding: 0.5em; margin: 0 10px 10px 0; border: solid 5px cyan; cursor: grab; }
+
+        .draggable:active {
+            background: white;
+            cursor: grabbing;
+        }
+        .snap-target { width: 90px; height: 90px; padding: 0.5em; margin: 0 10px 10px 0; border: solid 10px red; }
+
+
+        /* #drag-containment-wrapper { width: 100%; height:100%; border:2px solid #ccc; padding: 10px; } */
+
+        /* #drag-containment-wrapper {} */
+
+        .hover { border: 5px dashed magenta; background: chartreuse;}
+        .droppable {
+            background: mediumseagreen;
+        }
+
+        /* .droppable:hover,.droppable.hover{
+         background-color: rgba(255, 0, 119, 1); */
+
+    
+    </style>
 </head>
 <body>
     
 
 
-    <div class="grid-container">
+    <div class="grid-container" id="drag-containment-wrapper">
 
         <div class="topLeft"></div>
 
@@ -20,25 +45,33 @@
             <h1 id="computer-score">0</h1> 
         </div>
 
-        <div class="heldArea">
-            <div id="held-area" class=""></div>
-        </div>
-
         <div class="roundInfo">
             <p id="label-round">This Round</p>  
             <h1 id="round">0</h1>  
         </div>
 
         <div class="playArea">
-            <div id="play-area">
+            <a href="" class="button" id="button-roll">Roll</a>
+
+            <div class="heldArea">
+                <div id="held-area">
+                    <div class="snap-target droppable"></div>
+                </div>
             </div>
+
+                <div id="play-area" >
+
+                    <div class="stack">
+                        <div class="draggable"></div>
+                        <div class="draggable"></div>
+                        <div class="draggable"></div>
+                    </div>
+                </div>
         </div>
 
         <div class="footer">
             <h1 id="message" class=""></h1> 
             <a href="" class="button disabled" id="button-end">End Turn</a>
-            <a href="" class="button" id="button-roll">Roll</a>
-
         </div>
 
         <div class="console">
@@ -47,13 +80,45 @@
 
       </div>
 
+      <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.0/jquery.min.js"></script>
+      <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.9/jquery-ui.min.js"></script>
+
+      
+      <script>
+      // https://jqueryui.com/draggable/#default
+
+        $( function() {
+            $( ".draggable" ).draggable({ 
+                containment: "#drag-containment-wrapper", 
+                scroll: false,
+                snap: ".snap-target",
+                start: function() {  },
+                drag: function() {},
+                stop: function() {},
+            //  cursorAt: { top: 50, left: 50 } 
+            });
+
+            $( ".stack div" ).draggable({ stack: ".stack div" });
+
+             // https://stackoverflow.com/questions/47511657/trigger-hover-selector-when-dragging
+            // $( ".draggable" ).on('dragenter','.droppable',function(e){
+            //     e.preventDefault();
+            //     $(this).addClass('hover');
+            //     
+            // });
+
+            // $( ".draggable" ).on('dragleave','.droppable',function(e){
+            //     $(this).removeClass('hover');
+            //     
+            // });
+
+        } );
+        </script>
 
     <script defer src="text.js"></script>
     <script defer src="checkScoring.js"></script>
     <script defer src="game.js"></script>
     <script defer src="script.js"></script>
-
-
 
 </body>
 </html>

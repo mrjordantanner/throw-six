@@ -11,11 +11,19 @@ function throwDice(num) {
 	text.write(`Throwing ${num} dice`, 'blue');
 	for (let i = 0; i < num; i++) {
 		const newDie = new Die();
+
+        // it it's the cpu's turn, add a class to each die that prevents mouse pointer events
+        if (!playersTurn) {
+            newDie.div.classList.add('no-click');
+        }
+
 		// Manually set the dice value for testing
 		if (useRiggedDice) {
 			newDie.faceValue = riggedDice[i];
 		}
+
 		rolledMessage += newDie.faceValue.toString() + ' ';
+
 		dice.push(newDie);
 		diceInPlay.push(newDie);
 		playArea.appendChild(newDie.div);
@@ -43,16 +51,14 @@ function startCPUTurn() {
 // Control computer's turn
 function cpuTurn() {
 	console.log('2 - cpuTurn');
-// Handle dice throw
+
     const remainingDice = diceInPlay.length;
 	clearPlayArea();
 
 	// First turn throw 6 dice, otherwise throw remaining dice
 	if (diceInHeld.length === 0) {
-        //setTimeout(function(){ throwDice(6); }, gameSpeed);
         throwDice(6);
 	} else {
-       // setTimeout(function(){ throwDice(remainingDice); }, gameSpeed);
         throwDice(remainingDice);
 	}
 
@@ -62,21 +68,10 @@ function cpuTurn() {
         setTimeout(endTurn, gameSpeed);
         return;
     }
-	updateDiceUI();
-	updateScoreboard();
-////
+	updateUI();
+
     setTimeout(moveScoringGroups, gameSpeed);
-    //moveScoringGroups();
-  
-  	// if (diceInPlay.length > 2) {
-	// 	//cpuTurn();
-    //     setTimeout(cpuTurn, gameSpeed);
 
-	// } else {
-	// 	//endTurn();
-    //     setTimeout(endTurn, gameSpeed);
-
-	// }
 }
 
 // Called on player turns from the roll button
@@ -97,8 +92,7 @@ function handleDiceThrow() {
 	}
 
 	checkScoring();
-	updateDiceUI();
-	updateScoreboard();
+	updateUI();
 
     if (busted) {
         enable(buttonEnd);
@@ -125,30 +119,35 @@ function moveScoringGroups() {
 	});
 
     if (diceInPlay.length > 2) {
-		//cpuTurn();
         setTimeout(cpuTurn, gameSpeed);
 
 	} else {
-		//endTurn();
         setTimeout(endTurn, gameSpeed);
 	}
 }
 
 function endTurn() {
-    console.log('4B - endTurn');
+	console.log('4B - endTurn');
 	resetBoard();
 	disable(messageText);
 
 	if (playersTurn) {
-		playArea.style.background = 'darkRed';
-		heldArea.style.background = 'darkRed';
+		playArea.style.background = 'transparent';
+		heldArea.style.background = 'transparent';
 		playerScore += roundTotal;
 		text.write('Player ended their turn.', 'chartreuse');
 		text.write(`Earned ${roundTotal} points.`, 'chartreuse');
 		disable(buttonRoll);
 		disable(buttonEnd);
 		roundTotal = 0;
-		startCPUTurn();
+		checkForWin();
+		if (gameOver) {
+			//do gameover message, effects, etc
+			setTimeout(initialize, 5000);
+		}
+		else {
+			startCPUTurn();
+		}
 	} else {
 		playArea.style.background = 'black';
 		heldArea.style.background = 'black';
@@ -158,11 +157,17 @@ function endTurn() {
 		enable(buttonRoll);
 		// disable(buttonEnd);
 		roundTotal = 0;
-		startPlayerTurn();
+		checkForWin();
+		if (gameOver) {
+			//do gameover message, effects, etc
+			setTimeout(initialize, 5000);
+		}
+		else {
+			startPlayerTurn();
+		}
 	}
 
-	updateScoreboard();
-	checkForWin();
+	updateUI();
 }
 
 // If player 'busts' and doesn't roll any scoring die, enter this state
@@ -171,27 +176,32 @@ function endTurn() {
 // }
 
 function checkForWin() {
+
 	// Player wins
 	if (playerScore >= scoreGoal) {
+		disable(buttonRoll);
 		text.write(`You have reached ${scoreGoal} points.`, 'green');
 		text.write('YOU WIN!', 'bg-green');
+		messageText.innerText = `You reached ${scoreGoal} points. YOU WIN!`;
+		messageText.style.color = 'white';
+		enable(messageText);
+		gameOver = true;
+
 	}
 	// Computer wins
 	else if (computerScore >= scoreGoal) {
+		disable(buttonRoll);
 		text.write(`CPU has reached ${scoreGoal} points.`, 'red');
 		text.write('YOU LOSE.', 'bg-red');
-	}
-}
-
-function updateScoreboard() {
-	if (playersTurn) {
-		roundText.innerText = roundTotal;
-	} else {
-		roundText.innerText = roundTotal;
+		messageText.innerText = `CPU reached ${scoreGoal} points. You Lose.`;
+		messageText.style.color = 'red';
+		enable(messageText);
+		gameOver = true;
 	}
 
-	scoreText.innerText = playerScore;
-	computerScoreText.innerText = computerScore;
+
+	
 }
+
 // }
 //#endregion

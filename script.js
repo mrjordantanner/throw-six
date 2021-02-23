@@ -26,6 +26,7 @@ class Die {
         // Create div element to represent the die on screen
 		this.div = document.createElement('div');
 		this.div.classList.add('die');
+		this.div.classList.add('draggable');
 
         // Assign random face value to die, 1-6
 		const val = Math.floor(Math.random() * 6 + 1);
@@ -66,18 +67,17 @@ class ScoringGroup {
 // Global variables
 //const game = new Game();
 const text = new Text();
-const dice = [];
-const diceInPlay = [];
-const diceInHeld = [];
-const scoringGroupsInPlay = [];
+let dice = [];
+let diceInPlay = [];
+let diceInHeld = [];
+let scoringGroupsInPlay = [];
 let consoleLines = [];
 let playersTurn = true;
 let busted = false;
 let roundTotal = 0;
 let playerScore = 0;
 let computerScore = 0;
-const scoreGoal = 2000;     // when a player reaches this score, they win
-const gameSpeed = 1000;       // delay in ms between cpu moves
+let gameOver = false;
 
 // Dev tools
 let printToConsole = true;   // print to dev console or not
@@ -96,11 +96,13 @@ const computerScoreText = document.querySelector('#computer-score');
 const messageText = document.querySelector('#message');
 const consoleContainer = document.querySelector('#console-container');
 
+const gameSpeed = 300;       // delay in ms between cpu moves
+const scoreGoal = 5000;     // when a player reaches this score, they win
 // Print rules
 // text.write('DICE GAME RULES', 'bg-green');
 
 // Start game
-startPlayerTurn();
+initialize();
 //#endregion
 
 // BUTTONS & EVENTS
@@ -109,7 +111,15 @@ startPlayerTurn();
 playArea.addEventListener('click', (e) => {
 	e.preventDefault();
 
+	if (!playersTurn) {
+		return;
+	}
+
 	const targetDie = getDieByDiv(e.target);
+
+	if (targetDie.held) {
+		return;
+	}
 
 	if (e.target.classList.contains('die') && targetDie.scoring) {
 
@@ -126,8 +136,11 @@ playArea.addEventListener('click', (e) => {
         // Add total point value of dice held to running total for the round 
 		roundTotal += targetDie.group.value;
 
+
+
 		console.log(`Player round total: ${roundTotal}`);
-		updateScoreboard();
+		updateUI();
+
 	}
 });
 
@@ -175,10 +188,50 @@ function moveDie(div) {
 	}
 }
 
-function updateDiceUI() {
+function initialize() {
+	gameOver = false;
+	roundTotal = 0;
+	playerScore = 0;
+	cpuScore = 0;
+	busted = false;
+	dice = [];
+	diceInPlay = [];
+	diceInHeld = [];
+	scoringGroupsInPlay = [];
+	consoleLines = [];
+	disable(messageText);
+	resetBoard();
+	updateUI();
+	enable(buttonRoll);
+	startPlayerTurn();
+}
+
+function updateUI() {
+
+	// Score for the round
+	if (playersTurn) {
+		roundText.innerText = roundTotal;
+	} else {
+		roundText.innerText = roundTotal;
+	}
+
+	// grand totals
+	scoreText.innerText = playerScore;
+	computerScoreText.innerText = computerScore;
+
+	// button text
+	buttonEnd.innerText = `Cashout ${roundTotal}`;
+
+
+	diceRemaining = 6 - diceInHeld.length;
+
+
+	buttonRoll.innerText = `Throw ${diceRemaining}`;
+
     dice.forEach((die) => {
         die.updateUI();
     })
+
 }
 
 function checkParent(parent, child) {
@@ -261,6 +314,8 @@ function resetBoard() {
 	diceInHeld.length = 0;
     //console.log(`Clearing diceInHeld: ${diceInHeld.length}`);
     dice.length = 0;
+
+	
 }
 
 function enable(element) {

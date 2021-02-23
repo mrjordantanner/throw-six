@@ -26,7 +26,7 @@ p {
 
 /* Dice Areas */
 .area {
-    display: flex;
+    /* display: flex; */
     border: 1px cyan solid;
     margin: 25px;
 }
@@ -59,14 +59,12 @@ p {
 
 #play-area {
     background: black;
-    /* flex: 2; */
-    display: flex;
+    flex: 2; 
+     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
     height: 100%;
     width: 100%;
-
-
 }
 
 
@@ -85,7 +83,6 @@ p {
 
 /* Dice DIVS */
 .die {
-    /* position: relative; */
     display: flex;
     flex-direction: column;
     height: 75px;
@@ -95,7 +92,6 @@ p {
     align-items: center;
     justify-content: center;
     margin: 10px;
-
     font-weight: bold;
     font-size:30px;
     font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
@@ -105,23 +101,30 @@ p {
 
 .die:hover {
     border: 3px white solid;
+    cursor: grab;
 }
+
+.die:active {
+    background: rgba(255, 255, 255, 0.4);
+}
+
 
 .die .face-value {
     color: white;
     font-size: 50px;
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
     font-weight: bold;
-    pointer-events: none;
+/* pointer-events: none; */
     
 }
 
 .die .point-value {
-    color: yellow;
-    font-size: 30px;
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    color: white;
+    font-size: 20px;
+    font-style: italic;
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
     font-weight: bold;
-    pointer-events: none;
+    /* pointer-events: none; */
     
 }
 
@@ -151,6 +154,9 @@ p {
     background: purple;
 }
 
+.no-click {
+    pointer-events: none;
+}
 
 
 /* Text */
@@ -209,9 +215,7 @@ a.button {
     display: flex;
     align-items: center;
     justify-content: center;
-    position: absolute;
-    width: 150px;
-    height: 75px;
+    /* position: absolute; */
     border: 3px orange solid;
     font-size: 20px;
     text-decoration: none;
@@ -222,6 +226,7 @@ a.button {
 
 a.button:hover {
     border: 3px white solid;
+    color: white;
 }
 
 a.button:active {
@@ -230,15 +235,22 @@ a.button:active {
 
 
 #button-end {
-    /* top: 70%; */
+    width: 150px;
+    height: 75px;
     left: 0;
     position: relative;
 }
 
 #button-roll {
-    /* top: 85%; */
-    left: 0;
-    position: relative;
+    width: 200px;
+    height:200px;
+    left: 950px;
+    top: 610px;
+    position: absolute;
+    text-transform: uppercase;
+    font-size: 30px;
+    border-radius: 50%;
+
 
 }
 

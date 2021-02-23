@@ -39,41 +39,63 @@ function checkScoring() {
 		}
 	});
 	
+    // Functions
+    // creates a new scoring group, assigns dice to it, and gives the group some values
+    function groupDice(array, styleClass, type, value) {
+        // make new scoring group to assign these dice to
+        const thisGroup = new ScoringGroup(0, '', []);
+        // 'register' this group to keep track of it
+        scoringGroupsInPlay.push(thisGroup);
+
+            array.forEach((die) => {
+                // mark each die as 'scoring' and add styling
+                die.scoring = true;
+                die.div.classList.add(styleClass);
+                // Assign values to the scoring group
+                thisGroup.members.push(die);
+                thisGroup.type = type;
+                thisGroup.value = value;
+                // give each die a reference to the group it's in
+                die.group = thisGroup;
+            });
+        
+        text.write(`Rolled ${thisGroup.type}`, 'white-bold');
+    }
+
+    // treat singles slightly different to make sure they're really alone
+    function groupSingle(array, type, value) {
+        array.forEach((die) => {
+            if (die.group.type === 'None') {
+                const thisGroup = new ScoringGroup(0, '', []);
+                thisGroup.value = value;
+                thisGroup.type = type;
+                thisGroup.members.push(die);
+                scoringGroupsInPlay.push(thisGroup);
+                die.group = thisGroup;
+                die.scoring = true;
+                die.div.classList.add('scoring-solo');
+                text.write(`Rolled ${thisGroup.type}`, 'white-bold');
+            }
+        });
+    }
+
+    // Conditionals
     // PATTERN RECOGNITION and ASSIGNING GROUPS
 
     // THREE OR MORE OF A KIND
 	// Iterate through Sorted object's properties (the arrays sorted by dice face value)
     // 'Sorted' is an object with this format-- { ones: [], twos: [], etc }
 	Object.entries(sorted).forEach((entry) => {
-		// Iterate through the sorted arrays
+
 		if (entry[1].length >= 3) {
 
-            // Make an empty scoring group to assign values to to describe this group of dice
-
-            // TODO: Make a function out of this called assignScoringGroup
-            const thisGroup = new ScoringGroup(0, '', []);
-            scoringGroupsInPlay.push(thisGroup);    //'register' this group
-            //console.log(`Registered scoring group ${thisGroup}`);
-
-			entry[1].forEach((die) => {
-
-				die.scoring = true;
-				die.div.classList.add('scoring-group');
-
-                // Assign values to the scoring group
-                thisGroup.members.push(die);
-                const typeText = `${entry[1].length} ${entry[0]}`;
-                thisGroup.type = typeText;
-                thisGroup.value = ofAKindValue(entry[1]);
-                // give each die a reference to the group it's in
-                die.group = thisGroup;
-			});
-            //console.log(`Rolled ${entry[1].length} ${entry[0]}!`);
+            const typeText = `${entry[1].length} ${entry[0]}`;
+            const value = ofAKindValue(entry[1]);
+            groupDice(entry[1], 'scoring-group', typeText, value);
 		}
 	});
 
     // STRAIGHTS
-    // TODO: DRY THIS UP, consolidate into one function
     const one = getDieByFaceValue(1);
     const two = getDieByFaceValue(2);
     const three = getDieByFaceValue(3);
@@ -82,94 +104,32 @@ function checkScoring() {
     const six = getDieByFaceValue(6);
 
     if (two && three && four && five) {
-        if (one && six) {
-        const thisGroup = new ScoringGroup(0, '', []);
-        scoringGroupsInPlay.push(thisGroup);  
-        //console.log(`Registered scoring group ${thisGroup}`);
-            const array = [one, two, three, four, five, six];
-            array.forEach((die) => {
-							die.scoring = true;
-							die.div.classList.add('scoring-straight');
-							// Assign values to the scoring group
-							thisGroup.members.push(die);
-							thisGroup.type = 'Full Straight';
-							thisGroup.value = 1500;
-							// give each die a reference to the group it's in
-							die.group = thisGroup;
-						});
-                        text.write(`Got ${thisGroup.type}`,'white-bold');
-
-        } else if (one) {
-        const thisGroup = new ScoringGroup(0, '', []);
-        scoringGroupsInPlay.push(thisGroup);   
-        //console.log(`Registered scoring group ${thisGroup}`);
-            const array = [one, two, three, four, five];
-            array.forEach((die) => {
-							die.scoring = true;
-							die.div.classList.add('scoring-straight');
-							thisGroup.members.push(die);
-							thisGroup.type = 'Partial Straight 1-5';
-							thisGroup.value = 500;
-							die.group = thisGroup;
-						});
-                        text.write(`Got ${thisGroup.type}`, 'white-bold');
-        } else if (six) {
-        const thisGroup = new ScoringGroup(0, '', []);
-        scoringGroupsInPlay.push(thisGroup);   
-        //console.log(`Registered scoring group ${thisGroup}`);
-            const array = [two, three, four, five, six];
-            array.forEach((die) => {
-							die.scoring = true;
-							die.div.classList.add('scoring-straight');
-							thisGroup.members.push(die);
-							thisGroup.type = 'Partial Straight 2-6';
-							thisGroup.value = 750;
-							die.group = thisGroup;
-						});
-                        text.write(`Got ${thisGroup.type}`, 'white-bold');
-        }
-    }
+			if (one && six) {
+				const array = [one, two, three, four, five, six];
+				groupDice(array, 'scoring-straight', 'Full Straight', 1500);
+			} else if (one) {
+				const array = [one, two, three, four, five];
+				groupDice(array, 'scoring-straight', 'Partial Straight 2-6', 500);
+			} else if (six) {
+				const array = [two, three, four, five, six];
+				groupDice(array, 'scoring-straight', 'Partial Straight 1-5', 750);
+			}
+		}
 
     // SINGLE DICE
 	// Check for single 1's
 	if (sorted.ones.length > 0 && sorted.ones.length < 3) {
-		sorted.ones.forEach((die) => {
-			if (die.group.type === 'None') {
-                const thisGroup = new ScoringGroup(0, '', []);
-				thisGroup.value = 100;
-				thisGroup.type = 'Single 1';
-				thisGroup.members.push(die);
-                scoringGroupsInPlay.push(thisGroup);    
-                //console.log(`Registered scoring group ${thisGroup.type}`);
-				die.group = thisGroup;
-				die.scoring = true;
-				die.div.classList.add('scoring-solo');
-                text.write(`Got ${thisGroup.type}`, 'white-bold');
-			}
-		});
+        groupSingle(sorted.ones, 'Single 1', 100);
 
 	}
 	// Check for single 5's
 	if (sorted.fives.length > 0 && sorted.fives.length < 3) {
-
-		sorted.fives.forEach((die) => {
-			if (die.group.type === 'None') {
-                const thisGroup = new ScoringGroup(0, '', []);
-				thisGroup.value = 50;
-				thisGroup.type = 'Single 5';
-				thisGroup.members.push(die);
-                scoringGroupsInPlay.push(thisGroup);   
-                //console.log(`Registered scoring group ${thisGroup.type}`);
-				die.group = thisGroup;
-				die.scoring = true;
-				die.div.classList.add('scoring-solo');
-                text.write(`Got ${thisGroup.type}`, 'white-bold');
-			}
-		});
+        groupSingle(sorted.fives, 'Single 5', 50);
   	}
 
-	updateDiceUI();
+	updateUI();
 
+    // Bust Check
 	// If no scoring dice were produced during the roll, end turn and gain 0 points 
 	if (!anyScoring(diceInPlay)) {
 		// bust();
