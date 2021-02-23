@@ -117,7 +117,7 @@ function endTurn() {
 		playArea.style.background = 'darkRed';
 		heldArea.style.background = 'darkRed';
 		playerScore += roundTotal;
-		text.write(`Player ended their turn.`, 'chartreuse');
+		text.write('Player ended their turn.', 'chartreuse');
 		text.write(`Earned ${roundTotal} points.`, 'chartreuse');
 		disable(buttonRoll);
 		disable(buttonEnd);

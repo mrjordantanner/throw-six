@@ -8,7 +8,7 @@ body {
     background: #222222;
     color: antiquewhite;
     font-family: Arial, Helvetica, sans-serif;
-    font-size: 20px;
+    font-size: 16px;
 }
 
 h1 {
@@ -254,6 +254,14 @@ a.button:active {
 
 
 /* Console colors and styling */
+.red {
+    color: red;
+}
+
+.red-bold {
+    color:red;
+    font-weight: bold;
+}
 
 .bg-red {
     background: red;
@@ -262,9 +270,6 @@ a.button:active {
 
 .bg-green {
     background: chartreuse;
-}
-
-.black {
     color: black;
 }
 
@@ -272,9 +277,8 @@ a.button:active {
     color: chartreuse;
 }
 
-.red-bold {
-    color:red;
-    font-weight: bold;
+.black {
+    color: black;
 }
 
 .cyan {
@@ -301,13 +305,8 @@ a.button:active {
 .console-line {
     display: block;
     width: 95%;
-    /* height: 12px; */
-    font-size: 16px;
-    color: white;
     margin:2px;
-    /* line-height: 0.15rem; */
 }
-
 
 /* Grid */
 /* I used https://grid.layoutit.com/ to generate this */
@@ -325,7 +324,7 @@ a.button:active {
       "console footer";
   }
  
-  .heldArea { grid-area: heldArea; border: 1px solid transparent;}
+  .heldArea { grid-area: heldArea; border: 1px solid transparent˜;}
   .roundInfo { 
       display: flex;
       /* flex-direction: ; */

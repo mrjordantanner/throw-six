@@ -183,3 +183,47 @@ function checkScoring() {
 	}
 }
 //#endregion
+
+
+// CALCULATE "OF-A-KIND" VALUES
+//#region [Black]
+function ofAKindValue(dice) {
+    // TODO: DRY this up! consolidate conditionals, text.write generic formula to arrive at end value
+    
+        // Check for multiple 1's first bc they have higher point values
+        // Check for other 'of-a-kind's
+        switch (dice.length) {
+            case 3:
+                if (dice.some((die) => die.faceValue === 1)) {
+                    return 1000;
+                }
+                // return [`Three ${dice[0].faceValue}'s`, dice[0].faceValue * 100 * 1];
+                else return dice[0].faceValue * 100 * 1;
+                break;
+    
+            case 4:
+                if (dice.some((die) => die.faceValue === 1)) {
+                    return 2000;
+                }
+                // return [`Four ${dice[0].faceValue}'s`, dice[0].faceValue * 100 * 2];
+                else return dice[0].faceValue * 100 * 2;
+                break;
+    
+            case 5:
+                if (dice.some((die) => die.faceValue === 1)) {
+                    return 4000;
+                }
+                // return [`Five ${dice[0].faceValue}'s`, dice[0].faceValue * 100 * 4];
+                else return dice[0].faceValue * 100 * 4;
+                break;
+    
+            case 6:
+                if (dice.some((die) => die.faceValue === 1)) {
+                    return 8000;
+                }
+                // return [`Six ${dice[0].faceValue}'s`, dice[0].faceValue * 100 * 4];
+                return dice[0].faceValue * 100 * 4;
+                break;
+        }
+    }
+    //#endregion

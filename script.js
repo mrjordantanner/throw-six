@@ -61,92 +61,6 @@ class ScoringGroup {
 	}
 }
 
-
-// Handles text styling and output
-class Text {
-
-	constructor() {}
-
-	clear() {
-		let allConsoleLines = document.querySelectorAll('.console-line');
-		let numberOfLines = allConsoleLines.length;
-		if (numberOfLines > 0) {
-			for (let i = 0; i < numberOfLines; i++) {
-				allConsoleLines[i].remove();
-			}
-		}
-
-		allConsoleLines = [];
-		allConsoleLines.length = 0;
-	}
-
-	write(msg, style) {
-		const newText = document.createTextNode(msg);
-		const newLine = document.createElement('p');
-
-		newLine.appendChild(newText);
-		consoleContainer.appendChild(newLine);
-		consoleLines.push(newLine);
-		newLine.classList.add('console-line');
-		newLine.innerText = msg;
-		let css;
-
-		switch (style) {
-			default:
-				css = 'color: gray;';
-				newLine.classList.add('gray');
-				break;
-			case 'red':
-				css = 'color: red; font-weight: bold;';
-				newLine.classList.add('red');
-				break;
-			case 'white':
-				css = 'color: white;';
-				newLine.classList.add('white');
-				break;
-			case 'cyan':
-				css = 'color: cyan; font-weight: bold;';
-				newLine.classList.add('cyan');
-				newLine.classList.add('bold');
-				break;
-			case 'bg-red':
-				css = 'background: red; color: white;';
-				newLine.classList.add('bg-red');
-				break;
-
-			case 'chartreuse':
-				css = 'color: chartreuse;';
-				newLine.classList.add('green');
-				break;
-
-			case 'bg-green':
-				css = 'background: chartreuse; color: black;';
-				newLine.classList.add('bg-green');
-				newLine.classList.add('black');
-				break;
-
-			case 'red-bold':
-				css = 'color: red; font-weight:bold';
-				newLine.classList.add('red');
-				newLine.classList.add('bold');
-				break;
-
-			case 'white-bold':
-				css = 'color: white; font-weight:bold';
-				newLine.classList.add('white');
-				newLine.classList.add('bold');
-				break;
-		}
-
-		if (printToConsole) {
-			console.log('%c ' + msg, css);
-		}
-
-		consoleContainer.scrollTop = consoleContainer.scrollHeight;
-	}
-}
-//#endregion
-
 // DECLARATIONS
 //#region [Blue]
 // Global variables
@@ -164,7 +78,6 @@ let playerScore = 0;
 let computerScore = 0;
 const scoreGoal = 5000;     // when a player reaches this score, they win
 const gameSpeed = 1000;       // delay in ms between cpu moves
-
 
 // Dev tools
 let printToConsole = true;   // print to dev console or not
@@ -229,58 +142,13 @@ buttonRoll.addEventListener('click', (e) => {
 // End turn, lock in your points
 buttonEnd.addEventListener('click', (e) => {
     e.preventDefault();
+	console.clear();
     endTurn();
+
 })
-
-// COMPUTER TURN BUTTON
-// runCPU.addEventListener('click', (e) => {
-//     e.preventDefault();
-//     game.cpuTurn();
-// })
 //#endregion
 
-// CALCULATE "OF-A-KIND" VALUES
-//#region [DarkGray]
-function ofAKindValue(dice) {
-// TODO: DRY this up! consolidate conditionals, text.write generic formula to arrive at end value
 
-    // Check for multiple 1's first bc they have higher point values
-	// Check for other 'of-a-kind's
-	switch (dice.length) {
-		case 3:
-            if (dice.some((die) => die.faceValue === 1)) {
-            	return 1000;
-            }
-			// return [`Three ${dice[0].faceValue}'s`, dice[0].faceValue * 100 * 1];
-			else return dice[0].faceValue * 100 * 1;
-			break;
-
-		case 4:
-            if (dice.some((die) => die.faceValue === 1)) {
-			    return 2000;
-			}
-			// return [`Four ${dice[0].faceValue}'s`, dice[0].faceValue * 100 * 2];
-			else return dice[0].faceValue * 100 * 2;
-			break;
-
-		case 5:
-            if (dice.some((die) => die.faceValue === 1)) {
-                return 4000;
-            }
-			// return [`Five ${dice[0].faceValue}'s`, dice[0].faceValue * 100 * 4];
-			else return dice[0].faceValue * 100 * 4;
-			break;
-
-		case 6:
-            if (dice.some((die) => die.faceValue === 1)) {
-                return 8000;
-            }
-			// return [`Six ${dice[0].faceValue}'s`, dice[0].faceValue * 100 * 4];
-			return dice[0].faceValue * 100 * 4;
-			break;
-	}
-}
-//#endregion
 
 // FUNCTIONS
 //#region [DarkGray]
