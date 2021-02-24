@@ -136,13 +136,13 @@ function checkScoring() {
 	if (!anyScoring(diceInPlay)) {
 		// bust();
         text.write('BUSTED! No scoring dice rolled!', 'red-bold');
-        //messageText.innerText='BUSTED! No scoring dice rolled! 0 pts earned.';
-        //enable(messageText);
-        roundTotal = 0;
-        playArea.style.background = 'red';
         busted = true;
-        buttonEnd.innerText = 'End Turn';
-        //return endTurn();
+
+        roundTotal = 0;
+        document.body.style.background = bustedColor;
+        disable(buttonStand);
+        snd_bloop1.play();
+
 	}
 }
 //#endregion

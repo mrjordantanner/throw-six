@@ -1,88 +1,95 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link rel="icon" 
+      type="image/png" 
+      href="favicon/favicon-32x32.png">
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Throw Six - Dice Game</title>
     <link rel="stylesheet" href="style.css">
 
 </head>
 <body>
-    
 
-    
 
-    <div class="dice first-face">
+    <!-- <div class="die first-face">
         <span class="dot">
-        </span>
-      </div>
+    </span>
+    </div>
+
+    <div class="die second-face">
+        <span class="dot"></span>
+        <span class="dot"></span>
+    </div>
       
-      <div class="dice second-face">
-        <span class="dot">
-        </span>
-        <span class="dot">
-        </span>
-      </div>
-      
-      <div class="dice third-face">
+      <div class="die third-face">
         <span class="dot"></span>
         <span class="dot"></span>
         <span class="dot"></span>
-      </div>
+    </div>
       
-      <div class="fourth-face dice">
+      <div class="die fourth-face">
         <div class="column">
           <span class="dot"></span>
           <span class="dot"></span>
-        </div>
+       </div>
         <div class="column">
           <span class="dot"></span>
           <span class="dot"></span>
+    </div>
+    </div>
+
+    <div class="die fifth-face">
+        
+        <div class="column">
+          <span class="dot"></span>
+          <span class="dot"></span>
+        </div> 
+
+        <div class="column">
+          <span class="dot"></span>
         </div>
-      </div>
-      <div class="fifth-face dice">
         
         <div class="column">
           <span class="dot"></span>
           <span class="dot"></span>
         </div>
-        
-        <div class="column">
-          <span class="dot"></span>
-        </div>
-        
-        <div class="column">
-          <span class="dot"></span>
-          <span class="dot"></span>
-        </div>
       
-      </div>
-      <div class="sixth-face dice">
+    </div>
+      <div class="die sixth-face">
         <div class="column">
           <span class="dot"></span>
           <span class="dot"></span>
           <span class="dot"></span>
-        </div>
+    </div>
         <div class="column">
           <span class="dot"></span>
           <span class="dot"></span>
               <span class="dot"></span>
-        </div>
-      
-      </div>
-
-
-
+    </div>  -->
 
 
 
 
 
     <div class="grid-container">
-        <div class="scoreBoard border-cyan">
-            <h1 id="score">0</h1>   
-            <h1 id="computer-score">0</h1> 
+
+        <div class="scoreboard">
+
+            <h1 id="label-name-player" class="label-name">Player</h1>
+            <h1 id="score-player" class="score">0</h1>   
+            <div class="scorebar">
+                <div id="scorebar-fill-player"></div>
+            </div>
+
+            <h1 id="label-name-cpu" class="label-name">CPU</h1>
+            <h1 id="score-cpu" class="score">0</h1>   
+            <div class="scorebar">
+                <div id="scorebar-fill-cpu"></div>
+            </div>
+
         </div>
 
         <div class="heldArea">
@@ -91,9 +98,10 @@
             </div>
         </div>
 
-        <div class="roundInfo border-cyan">
+        <div class="roundInfo">
             <h1 id="round"></h1>
-            <a href="" class="button disabled" id="button-end">End Turn</a>
+            <a href="" class="button disabled" id="button-stand">End Turn</a>
+            
         </div>
 
         <div class="console">
@@ -102,56 +110,57 @@
 
         <div class="rollButton">
             <a href="" class="button" id="button-roll">Throw 6</a>
+            <a href="" class="button disabled" id="button-end">END TURN</a>
         </div>
 
         <div class="playArea">
             <div id="play-area">
-
-                <div class="die first-face">
-                    <span class="dot"></span>
-                </div>
-
+                <p id="message"></p> 
             </div>
-          </div>
     
-          <h1 id="message" class=""></h1> 
       </div>
 
 
-      <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.0/jquery.min.js"></script>
-      <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.9/jquery-ui.min.js"></script>
-
       
-      <script>
-      // https://jqueryui.com/draggable/#default
 
-        $( function() {
-            $( ".scoring" ).draggable({ 
-                containment: "#drag-containment-wrapper", 
-                scroll: false,
-                snap: ".snap-target",
-                start: function() {  },
-                drag: function() {},
-                stop: function() {},
-            //  cursorAt: { top: 50, left: 50 } 
-            });
 
-            $( ".stack div" ).draggable({ stack: ".stack div" });
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.0/jquery.min.js"></script>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.9/jquery-ui.min.js"></script>
 
-             // https://stackoverflow.com/questions/47511657/trigger-hover-selector-when-dragging
-            // $( ".draggable" ).on('dragenter','.droppable',function(e){
-            //     e.preventDefault();
-            //     $(this).addClass('hover');
-            //     
-            // });
+<script>
+    // https://jqueryui.com/draggable/#default
 
-            // $( ".draggable" ).on('dragleave','.droppable',function(e){
-            //     $(this).removeClass('hover');
-            //     
-            // });
+      $( function() {
+          $( ".die" ).draggable({ 
+              containment: "#drag-containment-wrapper", 
+              scroll: false,
+              snap: ".snap-target",
+              start: function() {  },
+              drag: function() {},
+              stop: function() {},
+          //  cursorAt: { top: 50, left: 50 } 
+          });
 
-        } );
-        </script>
+          $( ".stack div" ).draggable({ stack: ".stack div" });
+
+
+
+           // https://stackoverflow.com/questions/47511657/trigger-hover-selector-when-dragging
+          // $( ".draggable" ).on('dragenter','.droppable',function(e){
+          //     e.preventDefault();
+          //     $(this).addClass('hover');
+          //     
+          // });
+
+          // $( ".draggable" ).on('dragleave','.droppable',function(e){
+          //     $(this).removeClass('hover');
+          //     
+          // });
+
+      } );
+
+
+      </script>
 
     <script defer src="text.js"></script>
     <script defer src="checkScoring.js"></script>

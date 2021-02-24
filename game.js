@@ -4,7 +4,6 @@
 
 // Create and 'throw' num dice
 function throwDice(num) {
-    console.log('3 - throwDice');
 	dice.length = 0;
 	let rolledMessage = `Rolled `;
 	// Create num dice in play area
@@ -43,16 +42,15 @@ function startCPUTurn() {
     playersTurn = false;
 	text.write("== Start of CPU's turn", 'bg-red');
 	disable(buttonRoll);
-	disable(buttonEnd);
+	disable(buttonStand);
 	setTimeout(cpuTurn, gameSpeed);
 	console.log('1 - startCpuTurn');
 }
 
-// Control computer's turn
+// Control cpu's turn
 function cpuTurn() {
-	console.log('2 - cpuTurn');
 
-    const remainingDice = diceInPlay.length;
+	const remainingDice = diceInPlay.length;
 	clearPlayArea();
 
 	// First turn throw 6 dice, otherwise throw remaining dice
@@ -79,7 +77,7 @@ function cpuTurn() {
 function handleDiceThrow() {
 
 	disable(buttonRoll);
-    disable(buttonEnd);
+    disable(buttonStand);
 
 	const remainingDice = diceInPlay.length;
 	clearPlayArea();
@@ -99,8 +97,8 @@ function handleDiceThrow() {
     }
 }
 
-// Called on computer turn
-// Method for the computer to move all scoring dice over to the held area
+// Called on cpu turn
+// Method for the cpu to move all scoring dice over to the held area
 function moveScoringGroups() {
 	console.log(`MovingScoringGroups: ${scoringGroupsInPlay.length}`);
 	scoringGroupsInPlay.forEach((scoringGroup) => {
@@ -135,13 +133,14 @@ function endTurn() {
 	disable(messageText);
 
 	if (playersTurn) {
-		playArea.style.background = cpuTurnColor;
-		heldArea.style.background = cpuTurnColor;
+		labelNameCpu.classList.add('turn-indicator');
+		labelNamePlayer.classList.remove('turn-indicator');
+		document.body.style.background = cpuTurnColor;
 		playerScore += roundTotal;
 		text.write('Player ended their turn.', 'chartreuse');
 		text.write(`Earned ${roundTotal} points.`, 'chartreuse');
 		disable(buttonRoll);
-		disable(buttonEnd);
+		disable(buttonStand);
 		roundTotal = 0;
 		checkForWin();
 		if (gameOver) {
@@ -152,13 +151,15 @@ function endTurn() {
 			startCPUTurn();
 		}
 	} else {
-		playArea.style.background = 'black';
-		heldArea.style.background = 'black';
-		computerScore += roundTotal;
+		labelNameCpu.classList.remove('turn-indicator');
+		labelNamePlayer.classList.add('turn-indicator');
+		document.body.style.background = playerTurnColor;
+		//heldArea.style.background = 'black';
+		cpuScore += roundTotal;
 		text.write(`CPU ended their turn.`, 'red');
 		text.write(`Earned ${roundTotal} points.`, 'red');
 		enable(buttonRoll);
-		// disable(buttonEnd);
+		// disable(buttonStand);
 		roundTotal = 0;
 		checkForWin();
 		if (gameOver) {
@@ -191,8 +192,8 @@ function checkForWin() {
 		gameOver = true;
 
 	}
-	// Computer wins
-	else if (computerScore >= scoreGoal) {
+	// cpu wins
+	else if (cpuScore >= scoreGoal) {
 		disable(buttonRoll);
 		text.write(`CPU has reached ${scoreGoal} points.`, 'red');
 		text.write('YOU LOSE.', 'bg-red');
@@ -206,3 +207,74 @@ function checkForWin() {
 
 // }
 //#endregion
+
+
+
+// HTML for dice faces
+const html_dice1 = '<span class="dot"></span>';
+const html_dice2 = '<span class="dot"></span>' + '<span class="dot"></span>';
+const html_dice3 =
+	'<span class="dot"></span>' +
+	'<span class="dot"></span>' +
+	'<span class="dot"></span>';
+const html_dice4 =
+	'<div class="column">' +
+	'<span class="dot"></span>' +
+	'<span class="dot"></span>' +
+	'</div>' +
+	'<div class="column">' +
+	'<span class="dot"></span>' +
+	'<span class="dot"></span>' +
+	'</div>';
+const html_dice5 =
+	'<div class="column">' +
+	'<span class="dot"></span>' +
+	'<span class="dot"></span>' +
+	'</div>' +
+	'<div class="column">' +
+	'<span class="dot"></span>' +
+	'</div>' +
+	'<div class="column">' +
+	'<span class="dot"></span>' +
+	'<span class="dot"></span>' +
+	'</div>';
+const html_dice6 =
+	'<div class="column">' +
+	'<span class="dot"></span>' +
+	'<span class="dot"></span>' +
+	'<span class="dot"></span>' +
+	'</div>' +
+	'<div class="column">' +
+	'<span class="dot"></span>' +
+	'<span class="dot"></span>' +
+	'<span class="dot"></span>' +
+	'</div>';
+
+
+
+
+	// AUDIO
+	// https://www.w3schools.com/graphics/game_sound.asp
+	function sound(src) {
+		this.sound = document.createElement("audio");
+		this.sound.src = src;
+		this.sound.setAttribute("preload", "auto");
+		this.sound.setAttribute("controls", "none");
+		this.sound.style.display = "none";
+		document.body.appendChild(this.sound);
+		this.play = function(){
+		  this.sound.play();
+		}
+		this.stop = function(){
+		  this.sound.pause();
+		}
+	  }
+
+
+
+
+	  snd_tic1 = new sound("tic-1.wav");
+	  snd_tic2 = new sound("tic-2.wav");
+	  snd_menuChange1 = new sound("menu-change-1.wav");
+	  	  snd_menuChange2 = new sound("menu-change-2.wav");
+	  snd_bloop1 = new sound("bloop-1.wav");

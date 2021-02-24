@@ -26,39 +26,98 @@ class Die {
         // Create div element to represent the die on screen
 		this.div = document.createElement('div');
 		this.div.classList.add('die');
-		this.div.classList.add('draggable');
 
         // Assign random face value to die, 1-6
-		const val = Math.floor(Math.random() * 6 + 1);
-		this.faceValue = val;
+		this.faceValue = Math.floor(Math.random() * 6 + 1);
 		
+		// Create dots on the die face depending on what the face value is
+		switch (this.faceValue) {
+			case 1:
+				this.div.classList.add('first-face');
+				this.div.innerHTML = html_dice1;
+				break;
+			case 2:
+				this.div.classList.add('second-face');
+				this.div.innerHTML = html_dice2;
+				break;
+			case 3:
+				this.div.classList.add('third-face');
+				this.div.innerHTML = html_dice3;
+				break;
+			case 4:
+				this.div.classList.add('fourth-face');
+				this.div.innerHTML = html_dice4;
+				break;
+			case 5:
+				this.div.classList.add('fifth-face');
+				this.div.innerHTML = html_dice5;
+				break;
+			case 6:
+				this.div.classList.add('sixth-face');
+				this.div.innerHTML = html_dice6;
+				break;
+		}
+
         // Assign default values for scoringGroup that will later be overidden
 		this.group = new ScoringGroup(0, 'None', []);
 
         // create UI element and append as child
-        this.uiFaceValue = document.createElement('div');
-        this.uiPointValue = document.createElement('div');
-        this.uiFaceValue.classList.add('face-value');
-        this.uiPointValue.classList.add('point-value');
-        this.div.appendChild(this.uiFaceValue);
-        this.div.appendChild(this.uiPointValue);
+        //this.uiFaceValue = document.createElement('div');
+        //this.uiPointValue = document.createElement('div');
+        //this.uiFaceValue.classList.add('face-value');
+        //this.uiPointValue.classList.add('point-value');
+        //this.div.appendChild(this.uiFaceValue);
+        //this.div.appendChild(this.uiPointValue);
+
+		if (playersTurn) {
+			this.div.style.background = playerDieColor;
+		}
+		else {
+			this.div.style.background = cpuDieColor;
+		}
 
         this.updateUI();
         
+		// create dice at set position and rotation, THEN assign them the value so they'll animate using CSS transition
+		// const startLeft = buttonRoll.style.left;
+		// const startTop = buttonRoll.style.top;
+		// console.log(startLeft);
+		// console.log(startTop);
+		this.div.style.left ='0px';
+		this.div.style.top = '0px';
+		this.div.style.transform = 'rotate('+0+'2deg)';
+
+		// setTimeout(this.randomizePosition, 350);
+		// setTimeout(this.randomizeRotation, 350);
 		this.randomizePosition();
 		this.randomizeRotation();
-		//this.reverseRotation();
+
+		// setTimeout(function() {
+		// 	this.randomizePosition(this.div);
+		// }, 350)
+
+		// setTimeout(function() {
+		// 	this.randomizeRotation(this.div);
+		// }, 350)
+
 	}
 
 	randomizePosition() {
-
-		//from http://jsfiddle.net/redler/QcUPk/8/
-		let posx = (Math.random() * ($(playArea).width() - 300));
+	
+		//below is from http://jsfiddle.net/redler/QcUPk/8/
+		let posx = (Math.random() * ($(playArea).width() - 50));
 		let posy = (Math.random() * ($(playArea).height() - 50));
 
 		this.div.classList.add('absolute');
 		this.div.style.left = `${posx}px`;
 		this.div.style.top = `${posy}px`;
+
+
+        $('.die').css({ x: '400px', y: '400px' });
+
+		//this.div.translate(posx, posy);
+
+		//$(this).css({"-webkit-transform":"translate(100px,100px)"});​
 	}
 
 	randomizeRotation() {
@@ -73,8 +132,8 @@ class Die {
 
    // updates text on the die for testing
 	updateUI() {
-        this.uiFaceValue.innerText = this.faceValue;
-        this.uiPointValue.innerText = this.group.value;
+        // this.uiFaceValue.innerText = this.faceValue;
+        // this.uiPointValue.innerText = this.group.value;
 	}
 }
 
@@ -100,31 +159,39 @@ let playersTurn = true;
 let busted = false;
 let roundTotal = 0;
 let playerScore = 0;
-let computerScore = 0;
+let cpuScore = 0;
 let gameOver = false;
 
 // Dev tools
 let printToConsole = true;   // print to dev console or not
-const useRiggedDice = true;
+const useRiggedDice = false;
 const riggedDice = [1,2,3,4,5,6];
-const diceRotationAmount = 90;
+const diceRotationAmount = 360;
 
 // Element references
 const playArea = document.querySelector('#play-area');
 const heldArea = document.querySelector('#held-area');
 const buttonRoll = document.querySelector('#button-roll');
+const buttonStand = document.querySelector('#button-stand');
 const buttonEnd = document.querySelector('#button-end');
-const runCPU = document.querySelector('#button-runCPU');
 const roundText = document.querySelector('#round');
-const scoreText = document.querySelector('#score');
-const computerScoreText = document.querySelector('#computer-score');
+const scoreText = document.querySelector('#score-player');
+const cpuScoreText = document.querySelector('#score-cpu');
 const messageText = document.querySelector('#message');
 const consoleContainer = document.querySelector('#console-container');
+const playerScoreBar = document.querySelector('#scorebar-fill-player');
+const cpuScoreBar = document.querySelector('#scorebar-fill-cpu');
+const labelNameCpu = document.querySelector('#label-name-cpu');
+const labelNamePlayer = document.querySelector('#label-name-player');
 
 // Preferences
-const gameSpeed = 1000;       // delay in ms between cpu moves
-const scoreGoal = 5000;     // when a player reaches this score, they win
-const cpuTurnColor = 'transparent';
+const gameSpeed = 750;       // delay in ms between cpu moves
+const scoreGoal = 4000;     // when a player reaches this score, they win
+const playerTurnColor = '#222222';
+const cpuTurnColor = '#black';
+const playerDieColor = 'black;'
+const cpuDieColor = 'red';
+const bustedColor = 'red';
 // Print rules
 // text.write('DICE GAME RULES', 'bg-green');
 
@@ -147,12 +214,15 @@ playArea.addEventListener('click', (e) => {
 
 	if (e.target.classList.contains('die') && targetDie.scoring) {
 
+		console.log(e.target);
+
 		if (targetDie.held) {
 			return;
 		}
-		enable(buttonEnd);
+		enable(buttonStand);
         enable(buttonRoll);
 
+		snd_tic1.play();
 
 		if (targetDie.group.type === 'Single 1' || targetDie.group.type === 'Single 5') {
 			moveDie(e.target);
@@ -177,16 +247,31 @@ playArea.addEventListener('click', (e) => {
 // ROLL BUTTON
 buttonRoll.addEventListener('click', (e) => {
 	e.preventDefault();
-	disable(buttonRoll);
-    handleDiceThrow();
+
+	// If we've busted, this button ends the turn rather than throwing the dice
+	if (busted) {
+		disable(buttonRoll);
+		console.clear();
+		snd_tic2.play();
+		endTurn();
+	}
+	else {
+		disable(buttonRoll);
+		snd_tic2.play();
+		//setTimeout(handleDiceThrow, gameSpeed * 0.5);
+		handleDiceThrow();
+	}
+
+
 
 });
 
 // END TURN BUTTON
 // End turn, lock in your points
-buttonEnd.addEventListener('click', (e) => {
+buttonStand.addEventListener('click', (e) => {
     e.preventDefault();
 	console.clear();
+	snd_tic2.play();
     endTurn();
 
 })
@@ -194,29 +279,22 @@ buttonEnd.addEventListener('click', (e) => {
 
 
 // FUNCTIONS
-//#region [Blue]
+//#region [Orange]
 // TODO: move this to Game class
 // 'moves' the die and re-appends its corresponding div to playArea (or heldArea)
 function moveDie(div) {
 	// If in play area, move to held area
 	if (checkParent(playArea, div)) {
-		// reset dice rotation
+
 		const die = getDieByDiv(div);
 		die.reverseRotation();
-		// append
-		heldArea.appendChild(div);
 
-		die.held = true; // TODO: this is buggy
+		heldArea.appendChild(div);
+		die.held = true; 
 		die.updateUI();
-		// div.classList.remove('absolute');
-		// div.classList.add('reset-transform');
 		div.classList.remove('scoring');
 
-
-		// remove from diceInPlay array
-		const index = diceInPlay.indexOf(die);
-		diceInPlay.splice(index, 1);
-		// put in diceInHeld array
+		diceInPlay.splice(diceInPlay.indexOf(die), 1);
 		diceInHeld.push(die);
 		
         if (playersTurn && diceInHeld.length === 6) {
@@ -225,6 +303,7 @@ function moveDie(div) {
 	}
 }
 
+// Set/reset global variables and start the first turn
 function initialize() {
 	gameOver = false;
 	roundTotal = 0;
@@ -236,6 +315,9 @@ function initialize() {
 	diceInHeld = [];
 	scoringGroupsInPlay = [];
 	consoleLines = [];
+	labelNameCpu.classList.remove('turn-indicator');
+	labelNamePlayer.classList.add('turn-indicator');
+	document.body.style.background = playerTurnColor;
 	disable(messageText);
 	resetBoard();
 	updateUI();
@@ -254,12 +336,20 @@ function updateUI() {
 
 	// grand totals
 	scoreText.innerText = playerScore;
-	computerScoreText.innerText = computerScore;
+	cpuScoreText.innerText = cpuScore;
 
 	// button text
-	buttonEnd.innerText = `Cashout ${roundTotal}`;
+	buttonStand.innerText = `Stand at ${roundTotal}`;
 	buttonRoll.innerText = `Throw ${6 - diceInHeld.length}`;
 
+	// scorebar fills
+	const playerFill = (playerScore / scoreGoal ) * 100;
+	const cpuFill = (cpuScore / scoreGoal ) * 100;
+
+	playerScoreBar.style.width = `${playerFill}%`;
+	cpuScoreBar.style.width = `${cpuFill}%`;
+
+	// diceUI (point value)
     dice.forEach((die) => {
         die.updateUI();
     })
