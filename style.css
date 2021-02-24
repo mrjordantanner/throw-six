@@ -81,7 +81,7 @@ p {
     flex-direction: column;
     flex-wrap: wrap;
     justify-content: space-between;
-    background: black;
+    background: rgba(0,0,0,0.7);
     width: 15vw;
     min-width: 200px;
     height:100%;
@@ -380,23 +380,6 @@ a.button:active {
     opacity: 0.35; */
 }
 
-/* #button-end {
-    bottom: 0px;
-    width: 200px;
-    height: 200px;
-    font-size: 30px;
-    border-radius: 50%;
-    border: black solid 3px;
-}
-
-#button-end:hover {
-    border:8px black solid;
-    cursor: pointer;
-    background: rgba(255,255,255, 0.35);
-    /* filter: blur(2px);
-    opacity: 0.35; */
-} */
-
 .disabled {
     visibility: hidden;
     /* color: gray;
@@ -467,7 +450,7 @@ a.button:active {
     margin-top:10px;
     overflow-y: scroll;
     border-top: 4px solid gray;
-    background: black;
+    background: rgba(0,0,0,0.7);
 }
 
 #console-container::-webkit-scrollbar {

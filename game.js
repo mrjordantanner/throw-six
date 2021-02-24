@@ -32,12 +32,14 @@ function throwDice(num) {
 }
 
 function startPlayerTurn() {
+	document.body.style.background = playerTurnColor;
     busted = false;
 	playersTurn = true;
 	text.write("== Start of Player's turn", 'bg-green');
 }
 
 function startCPUTurn() {
+	document.body.style.background = cpuTurnColor;
     busted = false;
     playersTurn = false;
 	text.write("== Start of CPU's turn", 'bg-red');
@@ -72,8 +74,7 @@ function cpuTurn() {
 
 }
 
-// Called on player turns from the roll button
-// TODO move this to event listener?
+// Called on PLAYER turns from the roll button
 function handleDiceThrow() {
 
 	disable(buttonRoll);
@@ -93,11 +94,15 @@ function handleDiceThrow() {
 	updateUI();
 
     if (busted) {
-        enable(buttonEnd);
+		enable(buttonRoll);
+        buttonRoll.innerText = "END TURN";
+		enable(messageText);
+		messageText.innerText = 'Busted!  No scoring dice rolled.'
+		messageText.style.color = 'black';
     }
 }
 
-// Called on cpu turn
+// Called on CPU turn
 // Method for the cpu to move all scoring dice over to the held area
 function moveScoringGroups() {
 	console.log(`MovingScoringGroups: ${scoringGroupsInPlay.length}`);

@@ -137,7 +137,6 @@ function checkScoring() {
 		// bust();
         text.write('BUSTED! No scoring dice rolled!', 'red-bold');
         busted = true;
-
         roundTotal = 0;
         document.body.style.background = bustedColor;
         disable(buttonStand);
