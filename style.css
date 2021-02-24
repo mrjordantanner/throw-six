@@ -2,13 +2,22 @@
     box-sizing: border-box;
 }
 
-
 /* Basic HTML elements */
-body {
-    background: #222222;
+html, body {
+    background: #333333; 
     color: antiquewhite;
     font-family: Arial, Helvetica, sans-serif;
     font-size: 16px;
+
+    /* https://stackoverflow.com/questions/826782/how-to-disable-text-selection-highlighting */
+    /* Disallow text selection */
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Old versions of Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Edge, Opera and Firefox */
 }
 
 h1 {
@@ -58,13 +67,12 @@ p {
 } */
 
 #play-area {
+    width:100%;
+    height:100%;
     background: black;
-    flex: 2; 
-     display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    height: 100%;
-    width: 100%;
+    /* display: flex; */
+    /* flex-direction: row; */
+    /* flex-wrap: wrap; */
 }
 
 
@@ -72,12 +80,16 @@ p {
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;
+    justify-content: space-around;
     background: black;
-    border: 4px solid orange;
-    margin-left:10%;
-    width: 80%;
-    /* height: 100%; */
-    height:300px;
+    width: 100%;
+    height:100%;
+    padding: 20px;
+    border: orange 1px solid;
+}
+
+.absolute {
+    position: absolute;
 }
 
 
@@ -85,9 +97,9 @@ p {
 .die {
     display: flex;
     flex-direction: column;
-    height: 75px;
-    width: 75px; 
-    border: solid 1px red;
+    height: 90px;
+    width: 90px; 
+    border: solid 1px gray;
     text-align: center;
     align-items: center;
     justify-content: center;
@@ -96,67 +108,146 @@ p {
     font-size:30px;
     font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
     color: white;
-    cursor: default;
+    border-radius: 15%;
 }
-
-.die:hover {
-    border: 3px white solid;
-    cursor: grab;
-}
-
-.die:active {
-    background: rgba(255, 255, 255, 0.4);
-}
-
 
 .die .face-value {
     color: white;
-    font-size: 50px;
+    font-size: 30px;
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    font-weight: bold;
-/* pointer-events: none; */
+    pointer-events: none;
     
 }
 
 .die .point-value {
     color: white;
-    font-size: 20px;
+    font-size: 16px;
     font-style: italic;
     font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-    font-weight: bold;
-    /* pointer-events: none; */
+    pointer-events: none;
     
 }
 
 .die:hover {
-    border: orange solid 1px;
+    border: red solid 1px;
 }
 
-.scoring-solo:hover, .scoring-group:hover, .scoring-straight:hover {
+.scoring {
+    cursor: grab; 
+}
+
+.scoring:active {
+    background: white;
+    cursor: grabbing;
+}
+
+.scoring:hover {
     border: 4px solid white;
 }
 
-.scoring-solo:active, .scoring-group:active, .scoring-straight:active {
-    background: white;
-}
-
 .scoring-solo {
-    background: blue;
-    /* border: 2px solid blue; */
+    /* background: blue; */
+    border: 4px solid blue;
 }
 
 .scoring-group {
-    background: orange;
-    /* border: 2px solid blue; */
+    /* background: orange; */
+    border: 4px solid orange;
 }
 
 .scoring-straight {
-    background: purple;
+    /* background: purple; */
+    border: 4px solid purple;
 }
 
 .no-click {
     pointer-events: none;
 }
+
+
+
+
+/* CSS Dice w/ Dots */
+ /* https://betterprogramming.pub/creating-dice-in-flexbox-in-css-a02a5d85e516 */
+.dot {
+    display: block;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background-color:white;
+}
+
+.first-face {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .dice {
+    padding: 4px;
+    background-color: tomato;
+    width: 104px;
+    height: 104px;
+    border-radius: 10%;
+    margin-right : 10px;
+  }
+.second-face {
+    display: flex;
+    justify-content: space-between;
+}
+  
+  .second-face .dot:nth-of-type(2) {
+    align-self: flex-end;
+}
+  
+  .third-face {
+    display: flex;
+    justify-content: space-between;
+}
+  
+  .third-face .dot:nth-of-type(1) {
+    align-self :flex-end;
+}
+  
+  .third-face .dot:nth-of-type(2) {
+    align-self :center;
+}
+  
+  
+.fourth-face , .sixth-face, .fifth-face{
+    display: flex;
+    justify-content: space-between;
+}
+
+.fourth-face .column , .sixth-face .column, .fifth-face .column{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.fifth-face .column:nth-of-type(2) {
+    justify-content: center;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 /* Text */
@@ -188,11 +279,7 @@ color: chartreuse;
 }
 
 #round {
-    /* display:block;
-    position: absolute;
-    bottom: 0px;
-    left: 300px; */
-    font-size: 48px;
+    font-size:36px;
 }
 
 #label-round {
@@ -221,6 +308,7 @@ a.button {
     text-decoration: none;
     color: orange;
     cursor: default;
+    text-transform: uppercase;
 
 }
 
@@ -235,23 +323,23 @@ a.button:active {
 
 
 #button-end {
-    width: 150px;
-    height: 75px;
-    left: 0;
-    position: relative;
+    width: 100%;
+    height: 100%;
 }
 
 #button-roll {
+
+    bottom: 0px;
     width: 200px;
-    height:200px;
-    left: 950px;
-    top: 610px;
-    position: absolute;
-    text-transform: uppercase;
+    height: 200px;
     font-size: 30px;
     border-radius: 50%;
+}
 
-
+#button-roll:hover {
+    border:10px cyan solid;
+    box-shadow: inset;
+    cursor: pointer;
 }
 
 
@@ -263,6 +351,24 @@ a.button:active {
     border: gray dashed 1px; */
 }
 
+/* Drag & Drop */
+
+.snap-target { 
+    width: 90px; 
+    height: 90px; 
+    border: solid 1px blue; 
+}
+
+/* #drag-containment-wrapper {} */
+
+.hover { border: 5px dashed magenta; background: chartreuse;}
+
+.droppable {
+    border: solid 2px yellow;
+}
+
+/* .droppable:hover,.droppable.hover{
+ background-color: rgba(255, 0, 119, 1); */
 
 
 /* Console colors and styling */
@@ -304,8 +410,9 @@ a.button:active {
 #console-container {
     /* display: none; */
     width: 100%;
-    height:100%;
+    height:200px;
     padding: 20px;
+    margin-top:20px;
     overflow-y: scroll;
     
 }
@@ -320,51 +427,39 @@ a.button:active {
     margin:2px;
 }
 
+.border-cyan {
+    border: 1px solid cyan;
+}
+
+
+/* display: flex; justify-content: center; align-items: center;  */
+
+
 /* Grid */
 /* I used https://grid.layoutit.com/ to generate this */
-.grid-container {
+  .grid-container {
     height: 97vh;
     display: grid;
-    grid-template-columns: 0.8fr 2.8fr;
-    grid-template-rows: 0.4fr 3.3fr 1.5fr 1.6fr 0.6fr;
+    grid-template-columns: 0.1fr 1.2fr 3.1fr 1.3fr 0.1fr;
+    grid-template-rows: 0.1fr 0.9fr 2.9fr 0.5fr 3.2fr 0.1fr;
     gap: 0px 0px;
     grid-template-areas:
-      "topLeft header"
-      "heldArea playArea"
-      "roundInfo playArea"
-      "console playArea"
-      "console footer";
+      ". . . . ."
+      ". scoreBoard scoreBoard heldArea ."
+      ". . playArea heldArea ."
+      ". . playArea roundInfo ."
+      ". rollButton playArea console ."
+      ". . . . .";
   }
- 
-  .heldArea { grid-area: heldArea; border: 1px solid transparent˜;}
-  .roundInfo { 
-      display: flex;
-      /* flex-direction: ; */
-      grid-area: roundInfo; 
-      border: 1px solid transparent;
-    }
-  .playArea { 
-      grid-area: playArea; 
-      border: 1px solid cyan;
-    
-    }
-  .console { grid-area: console; border: 1px solid transparent;}
-  .footer { grid-area: footer; border: 1px solid transparent;}
-  .header { grid-area: header; border: 1px solid transparent;}
-  .topLeft { grid-area: topLeft; border: 1px solid transparent;}
-
-
-
-  /* sub-grid for Round Info section */
-  /* .grid-round {
-    display: grid;
-    grid-template-columns: 1.1fr 1.1fr;
-    grid-template-rows: 1fr 1fr;
-    gap: 0px 0px;
-    grid-template-areas:
-      "labelRound buttonEnd"
-      "round buttonEnd";
-  }
-  .buttonEnd { grid-area: buttonEnd; }
-  .roundLabel { grid-area: roundLabel; }
-  .roundScore { grid-area: roundScore; } */
+  
+  .scoreBoard { grid-area: scoreBoard; }
+  
+  .heldArea { grid-area: heldArea;display: flex; justify-content: center; align-items: center;  }
+  
+  .roundInfo { grid-area: roundInfo; display: flex; justify-content: center; align-items: center; }
+  
+  .console { grid-area: console; }
+  
+  .rollButton { grid-area: rollButton; display: flex; justify-content: center; align-items: center; }
+  
+  .playArea { grid-area: playArea; }

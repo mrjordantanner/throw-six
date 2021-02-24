@@ -102,7 +102,6 @@ function handleDiceThrow() {
 // Called on computer turn
 // Method for the computer to move all scoring dice over to the held area
 function moveScoringGroups() {
-    console.log('4A - moveScoringGroups');
 	console.log(`MovingScoringGroups: ${scoringGroupsInPlay.length}`);
 	scoringGroupsInPlay.forEach((scoringGroup) => {
 		if (scoringGroup.type === 'Single') {
@@ -118,7 +117,12 @@ function moveScoringGroups() {
 		}
 	});
 
-    if (diceInPlay.length > 2) {
+	// "Decide" for the CPU when to stop rolling the dice and end the turn
+	// Chooses from a pool of three possibilities with three weighted values 
+	const rollThreshold = randomWeighted(1, 2, 3, 15, 85);
+	console.log(`rollThreshold: ${rollThreshold}`)
+
+    if (diceInPlay.length > rollThreshold) {
         setTimeout(cpuTurn, gameSpeed);
 
 	} else {
@@ -127,13 +131,12 @@ function moveScoringGroups() {
 }
 
 function endTurn() {
-	console.log('4B - endTurn');
 	resetBoard();
 	disable(messageText);
 
 	if (playersTurn) {
-		playArea.style.background = 'transparent';
-		heldArea.style.background = 'transparent';
+		playArea.style.background = cpuTurnColor;
+		heldArea.style.background = cpuTurnColor;
 		playerScore += roundTotal;
 		text.write('Player ended their turn.', 'chartreuse');
 		text.write(`Earned ${roundTotal} points.`, 'chartreuse');
@@ -199,8 +202,6 @@ function checkForWin() {
 		gameOver = true;
 	}
 
-
-	
 }
 
 // }

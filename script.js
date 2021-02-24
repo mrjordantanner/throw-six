@@ -45,9 +45,33 @@ class Die {
 
         this.updateUI();
         
+		this.randomizePosition();
+		this.randomizeRotation();
+		//this.reverseRotation();
 	}
 
-    // updates text on the die for testing
+	randomizePosition() {
+
+		//from http://jsfiddle.net/redler/QcUPk/8/
+		let posx = (Math.random() * ($(playArea).width() - 300));
+		let posy = (Math.random() * ($(playArea).height() - 50));
+
+		this.div.classList.add('absolute');
+		this.div.style.left = `${posx}px`;
+		this.div.style.top = `${posy}px`;
+	}
+
+	randomizeRotation() {
+		const num = Math.random() * diceRotationAmount;
+		this.div.style.transform = 'rotate('+num+'2deg)';
+	}
+
+	reverseRotation() {
+		this.div.classList.remove('absolute');
+		this.div.style.transform = 'none';
+	}
+
+   // updates text on the die for testing
 	updateUI() {
         this.uiFaceValue.innerText = this.faceValue;
         this.uiPointValue.innerText = this.group.value;
@@ -81,8 +105,9 @@ let gameOver = false;
 
 // Dev tools
 let printToConsole = true;   // print to dev console or not
-const useRiggedDice = false;
+const useRiggedDice = true;
 const riggedDice = [1,2,3,4,5,6];
+const diceRotationAmount = 90;
 
 // Element references
 const playArea = document.querySelector('#play-area');
@@ -96,8 +121,10 @@ const computerScoreText = document.querySelector('#computer-score');
 const messageText = document.querySelector('#message');
 const consoleContainer = document.querySelector('#console-container');
 
-const gameSpeed = 300;       // delay in ms between cpu moves
+// Preferences
+const gameSpeed = 1000;       // delay in ms between cpu moves
 const scoreGoal = 5000;     // when a player reaches this score, they win
+const cpuTurnColor = 'transparent';
 // Print rules
 // text.write('DICE GAME RULES', 'bg-green');
 
@@ -105,8 +132,9 @@ const scoreGoal = 5000;     // when a player reaches this score, they win
 initialize();
 //#endregion
 
+
 // BUTTONS & EVENTS
-//#region [Blue]
+//#region [Red]
 // CLICK ON DICE IN PLAY AREA
 playArea.addEventListener('click', (e) => {
 	e.preventDefault();
@@ -117,29 +145,31 @@ playArea.addEventListener('click', (e) => {
 
 	const targetDie = getDieByDiv(e.target);
 
-	if (targetDie.held) {
-		return;
-	}
-
 	if (e.target.classList.contains('die') && targetDie.scoring) {
 
-        enable(buttonEnd);
+		if (targetDie.held) {
+			return;
+		}
+		enable(buttonEnd);
         enable(buttonRoll);
 
-		if (targetDie.group.type === 'Single') {
+
+		if (targetDie.group.type === 'Single 1' || targetDie.group.type === 'Single 5') {
 			moveDie(e.target);
 		} else {
 			targetDie.group.members.forEach((die) => {
 				moveDie(die.div);
+				console.log(`click event moving die: ${die.faceValue}`);
 			});
+			console.log(`held dice: ${diceInHeld.length}`)
 		}
         // Add total point value of dice held to running total for the round 
 		roundTotal += targetDie.group.value;
 
-
-
 		console.log(`Player round total: ${roundTotal}`);
 		updateUI();
+
+	//	targetDie.reverseRotation();
 
 	}
 });
@@ -163,28 +193,35 @@ buttonEnd.addEventListener('click', (e) => {
 //#endregion
 
 
-
 // FUNCTIONS
-//#region [DarkGray]
+//#region [Blue]
 // TODO: move this to Game class
 // 'moves' the die and re-appends its corresponding div to playArea (or heldArea)
 function moveDie(div) {
 	// If in play area, move to held area
 	if (checkParent(playArea, div)) {
-		heldArea.appendChild(div);
+		// reset dice rotation
 		const die = getDieByDiv(div);
+		die.reverseRotation();
+		// append
+		heldArea.appendChild(div);
+
 		die.held = true; // TODO: this is buggy
 		die.updateUI();
+		// div.classList.remove('absolute');
+		// div.classList.add('reset-transform');
+		div.classList.remove('scoring');
+
 
 		// remove from diceInPlay array
 		const index = diceInPlay.indexOf(die);
 		diceInPlay.splice(index, 1);
 		// put in diceInHeld array
 		diceInHeld.push(die);
-
+		
         if (playersTurn && diceInHeld.length === 6) {
             disable(buttonRoll);
-        }
+       }
 	}
 }
 
@@ -209,11 +246,11 @@ function initialize() {
 function updateUI() {
 
 	// Score for the round
-	if (playersTurn) {
-		roundText.innerText = roundTotal;
-	} else {
-		roundText.innerText = roundTotal;
-	}
+	// if (playersTurn) {
+	// 	roundText.innerText = roundTotal;
+	// } else {
+	// 	roundText.innerText = roundTotal;
+	// }
 
 	// grand totals
 	scoreText.innerText = playerScore;
@@ -221,18 +258,37 @@ function updateUI() {
 
 	// button text
 	buttonEnd.innerText = `Cashout ${roundTotal}`;
-
-
-	diceRemaining = 6 - diceInHeld.length;
-
-
-	buttonRoll.innerText = `Throw ${diceRemaining}`;
+	buttonRoll.innerText = `Throw ${6 - diceInHeld.length}`;
 
     dice.forEach((die) => {
         die.updateUI();
     })
 
 }
+
+// https://stackoverflow.com/questions/1527803/generating-random-whole-numbers-in-javascript-in-a-specific-range
+function getRandomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+// https://stackoverflow.com/questions/8435183/generate-a-weighted-random-number
+function randomWeighted(num1, num2, num3, weight1, weight2) {
+	var n = Math.floor(Math.random()*100)
+	switch(n){
+	  case n < weight1:
+		return num1;
+	  case n < weight2:
+		return num2;
+	  case n < 100:
+		return num3;
+		default:
+			console.log('randomWeighted default')
+		return num2;
+	}
+  }
+
 
 function checkParent(parent, child) {
 	if (parent.contains(child)) {
@@ -293,12 +349,9 @@ function clearPlayArea() {
 
 	diceInPlay.length = 0;
     scoringGroupsInPlay.length = 0;
-   // console.log(`Clearing diceInPlay: ${diceInPlay.length} and scoringGroups`);
-   // console.log('Cleared diceInPlay and scoringGroupsInPlay arrays');
 }
 
 function resetBoard() {
-    //console.log('Reset Board');
 
 	diceInPlay.forEach((die) => {
 		if (diceInPlay.length > 0) die.div.remove();
@@ -312,9 +365,7 @@ function resetBoard() {
 	});
 
 	diceInHeld.length = 0;
-    //console.log(`Clearing diceInHeld: ${diceInHeld.length}`);
     dice.length = 0;
-
 	
 }
 

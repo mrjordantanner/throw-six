@@ -50,6 +50,7 @@ function checkScoring() {
             array.forEach((die) => {
                 // mark each die as 'scoring' and add styling
                 die.scoring = true;
+                die.div.classList.add('scoring');
                 die.div.classList.add(styleClass);
                 // Assign values to the scoring group
                 thisGroup.members.push(die);
@@ -73,6 +74,7 @@ function checkScoring() {
                 scoringGroupsInPlay.push(thisGroup);
                 die.group = thisGroup;
                 die.scoring = true;
+                die.div.classList.add('scoring');
                 die.div.classList.add('scoring-solo');
                 text.write(`Rolled ${thisGroup.type}`, 'white-bold');
             }
@@ -139,6 +141,7 @@ function checkScoring() {
         roundTotal = 0;
         playArea.style.background = 'red';
         busted = true;
+        buttonEnd.innerText = 'End Turn';
         //return endTurn();
 	}
 }
