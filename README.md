@@ -3,7 +3,8 @@
 
 In 'Throw Six', six dice are thrown and the player and computer alternate turns. Points are gained for every 1 or 5 thrown, for three or more of a kind, and for straights. The first player to earn 5000 points is the winner.
 
-![Screen Shot 2021-02-25 at 8 31 51 AM](https://user-images.githubusercontent.com/50030252/109171255-37f33080-7747-11eb-9d23-c5cdc7b00db0.png)
+![Throw-Six-GIF-2](https://user-images.githubusercontent.com/50030252/109187859-e8693080-7757-11eb-8038-0992fa681646.gif)
+
 
 ### Play Here: https://mrjordantanner.github.io/throw-six/
 
@@ -26,6 +27,8 @@ Click the 'Throw 6' button to throw six dice.  If you rolled any scoring dice, t
 - Full Straight 1-6 = 1500 points
 - Partial Straight 1-5 = 500 points
 - Partial Straight 2-6 = 750 points
+___
+![Screen Shot 2021-02-25 at 8 31 51 AM](https://user-images.githubusercontent.com/50030252/109171255-37f33080-7747-11eb-9d23-c5cdc7b00db0.png)
 
 # Under the Hood :gear:
 After creating and rolling the dice objects, the game checks for any straights, three or more of a kind, or single 1's or 5's.  If it finds any, it assigns each group of dice to a 'Scoring Group' and gives it the appropriate point value.  Single scoring dice are given their own group and are treated the same way as a group.
@@ -66,6 +69,9 @@ If this project is expanded upon further, I plan to add:
 - Custom color schemes and dice colors
 - All dice in scoring group are highlighted when one member of the group is hovered over
 - A more detailed tooltip appears on mouseover over certain key items to provide more information to the user.
+
+## Known Issues :microbe:
+- Sometimes clicking on dice doesn't register
 
 ## Credits :white_check_mark:
 - This application was written entirely by me, Jordan Smith, unless otherwise cited in the code.
