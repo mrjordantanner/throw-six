@@ -9,6 +9,7 @@ html, body {
     color: antiquewhite;
     font-family: 'Open Sans', sans-serif;
     font-size: 16px;
+    overflow: hidden;
 
     /* https://stackoverflow.com/questions/826782/how-to-disable-text-selection-highlighting */
     /* Disallow text selection */
@@ -25,8 +26,8 @@ html, body {
     --random-point-y: 0px;
     --random-rotation: 0deg;
 
-    --throw-origin-x: 800px;
-    --throw-origin-y: 50px;
+    --throw-origin-x: 0;
+    --throw-origin-y: 0;
     --throw-animation-time: 1s;
 }
 
@@ -58,8 +59,8 @@ p {
     flex-direction: column;
     flex-wrap: wrap;
     background: rgba(0,0,0,0.3);
-    width: 15vw;
-    min-width: 200px;
+    width: 12vw;
+    min-width: 100px;
     height:100%;
     max-height: 250px;
     padding: 20px;
@@ -67,14 +68,27 @@ p {
 
 /* Dice  */
 .die {
+    /* display: flex;
+    flex-direction: row; */
     height: 50px;
     width: 50px; 
     border: solid 1px black;
     margin: 10px;
     padding: 5px;
     border-radius: 10%;
-    transition: border 0.08s linear;
 }
+
+.die-point-value {
+    color:chartreuse;
+    font-size: 14px;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-style: italic;
+    display: block;
+    position: relative;
+    left: 30px;
+    top: 50px;
+}
+
 
 .die-animation {
     animation: throw var(--throw-animation-time);
@@ -97,15 +111,16 @@ p {
 
 .scoring {
     cursor: grab; 
-}
-
-.scoring:active {
-    background: white;
-    cursor: grabbing;
+    transition: border 0.08s ease-out;
 }
 
 .scoring:hover {
-    border: 4px solid white;
+    border: antiquewhite 4px solid;
+}
+
+.scoring:active {
+    background: antiquewhite;
+    cursor: grabbing;
 }
 
 .scoring-solo {
@@ -201,8 +216,8 @@ p {
 }
 
 .turn-indicator {
-    border-left: 5px solid white;
-    border-right: 5px solid white;
+    border-left: 5px dotted antiquewhite;
+    
 }
 
 .scorebar {
@@ -236,14 +251,14 @@ p {
     justify-content: center;
     align-items: center;
     position: absolute;
-    top:35%;
+    top:25%;
     left:0%;
     color:antiquewhite;
     background: rgba(0,0,0,0.5);
-    font-size: 30px;
+    font-size: 40px;
     text-align: center;
     width: 100%;
-    height: 60px;
+    height: 80px;
     z-index: 1;
 }
 
@@ -259,32 +274,26 @@ a.button {
 
 }
 
-a.button:hover {
-    border: 3px white solid;
-    color: white;
-}
-
-a.button:active {
-    background: white;
-}
-
-
 #button-stand {
     width: 15vw;
     min-width: 200px;
     height: 100%;
-    font-size: auto;
     font-weight: bold;
     color: chartreuse;
     border: 4px solid chartreuse;
-
+    background: transparent;
 }
 
 #button-stand:hover {
-    border:4px white solid;
+    border:4px antiquewhite solid;
     cursor: pointer;
 }
 
+#button-stand:active {
+    border: 2px cyan solid !important;
+    cursor: grab;
+    background: antiquewhite;
+}
 
 #button-roll {
     bottom: 0px;
@@ -292,18 +301,24 @@ a.button:active {
     height: 200px;
     font-size: 30px;
     border-radius: 50%;
-    border: 4px red solid;
+    border: 4px black solid;
+    background: rgba(0,0,0,0.3);
+    color:antiquewhite;
+    
 }
 
-a.button:hover {
-    border: white 4px solid;
-}
-
-/* #button-roll:hover {
-    border: 8px red solid;
+#button-roll:hover {
+    border: 8px chartreuse solid !important;
     cursor: pointer;
-    background-color: blue;
-} */
+    background-color: black;
+    color: white;
+}
+
+#button-roll:active {
+    border: 2px cyan solid !important;
+    cursor: grab;
+    background: antiquewhite;
+}
 
 .disabled {
     visibility: hidden;
@@ -312,7 +327,6 @@ a.button:hover {
 /* Console colors and styling */
 .red {
     color: red;
-    background: black;
 }
 
 .red-bold {
@@ -322,7 +336,7 @@ a.button:hover {
 
 .bg-red {
     background: red;
-    color: white;
+    color: antiquewhite;
 }
 
 .bg-green {
@@ -366,6 +380,7 @@ a.button:hover {
     width: 100%;
     margin:2px;
     font-size: 14px;
+    text-align: right;
 }
 
 

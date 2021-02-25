@@ -1,4 +1,5 @@
-// Analyzes rolled dice for patterns and groups them
+// SCORING.JS analyzes rolled dice for patterns and groups them
+
 function checkScoring() {
 
 	// Make an object of arrays to hold our dice sorted by their rolled values
@@ -152,36 +153,7 @@ function checkScoring() {
 		groupSingle(sorted.fives, 'Single 5', 50);
 	}
 
-    // Either enter bust state if no scoring dice rolled, or select scoring dice
-	if (anyScoring(diceInPlay)) {
-		busted = false;
-		if (!playersTurn) {
-			setTimeout(moveScoringGroups, 1200);
-		}
-	} else {
-		setTimeout(handleBust, 800);
-	}
+	// After checking is complete, test for 'busted' state
+	bustCheck();
 
-    // Handle 'Bust' and 'End Turn' states for player and cpu
-	function handleBust() {
-		busted = true;
-		roundTotal = 0;
-		document.body.style.background = bustedColor;
-		disable(buttonStand);
-		snd_bloop1.play();
-
-		if (playersTurn) {
-			enable(buttonRoll);
-			buttonRoll.innerText = 'END TURN';
-			enable(messageText);
-			messageText.innerText = 'Busted!  No scoring dice rolled.';
-			text.write('Busted! No scoring dice rolled.', 'red-bold');
-			messageText.style.color = 'white';
-			buttonRoll.style.color = 'black';
-			buttonRoll.style.border = '4px solid black';
-		} else {
-			setTimeout(endTurn, 1000);
-            text.write('CPU Busted! No scoring dice rolled.', 'red-bold');
-		}
-	}
 }

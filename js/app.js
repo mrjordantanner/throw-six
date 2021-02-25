@@ -2,6 +2,8 @@
 // Dice Game by Jordan T. Smith
 // General Assmebly SEIR-201, Unit 1
 
+// APP.JS contains the Die class, global variables, button events, and utility functions
+
 // CLASSES
 class Die {
 	constructor(
@@ -9,17 +11,13 @@ class Die {
 		div,
 		held = false,
 		scoring = false,
-		group,
-		uiFaceValue,
-		uiPointValue
+		group
 	) {
 		this.faceValue = faceValue; // the rolled value of the die
 		this.div = div; // reference to visual element in window
 		this.held = held; // bool, is die in the held area?
 		this.scoring = scoring; // bool, is die currently worth any points?
 		this.group = group; // reference to the scoringGroup this die is in, if any
-		this.uiFaceValue = uiFaceValue;
-		this.uiPointValue = uiPointValue;
 
 		// Create div element to represent the die on screen
 		this.div = document.createElement('div');
@@ -34,11 +32,6 @@ class Die {
 
 		// Assign default values for scoringGroup that will later be overidden
 		this.group = new ScoringGroup(0, 'None', []);
-
-		// create UI element and append as child
-		//this.uiPointValue = document.createElement('div');
-		//this.uiPointValue.classList.add('point-value');
-		//this.div.appendChild(this.uiPointValue);
 
 		// Set the color of the dice according to user preferences
 		if (playersTurn) {
@@ -55,23 +48,32 @@ class Die {
 		this.div.classList.add('no-click');
 		this.div.classList.add('die-animation');
 		
+		const randomX = getRandomInt(-120, 600);
+		const randomY = getRandomInt(50, 400);
 		const randomRot = getRandomInt(800, 1400) * -1;
-		const randomX = getRandomInt(-100, 600);
-		const randomY = getRandomInt(50, 500);
 		const randomTime = getRandomRange(0.2, 1);
 
-		// --throw-origin-x: -200px;
-		// --throw-origin-y: 550px;
-
 		// set beginning and end point of throw depending on player
-		this.div.style.setProperty('--throw-origin-x', '-200px');
-		this.div.style.setProperty('--throw-origin-y', '500px');
-
+		if (playersTurn) {
 		// Player throw
+		this.div.style.setProperty('--throw-origin-x', '-200px');
+		this.div.style.setProperty('--throw-origin-y', '750px');
 		this.div.style.setProperty('--random-point-x', randomX + 'px');
 		this.div.style.setProperty('--random-point-y', randomY + 'px');
 		this.div.style.setProperty('--random-rotation', randomRot + 'deg');
 		this.div.style.setProperty('--throw-animation-time', randomTime + 's');
+		}
+		else {
+		// CPU throw
+		this.div.style.setProperty('--throw-origin-x', '800px');
+		this.div.style.setProperty('--throw-origin-y', '-425px');
+		this.div.style.setProperty('--random-point-x', randomX + 'px');
+		this.div.style.setProperty('--random-point-y', randomY + 'px');
+		this.div.style.setProperty('--random-rotation', randomRot + 'deg');
+		this.div.style.setProperty('--throw-animation-time', randomTime + 's');
+
+
+		}
 	}
 }
 
@@ -114,16 +116,12 @@ const labelNameCpu = document.querySelector('#label-name-cpu');
 const labelNamePlayer = document.querySelector('#label-name-player');
 
 // Preferences
-const scoreGoal = 4000;
-const playerTurnColor = '#333333';
-const cpuTurnColor = '#111111';
+const scoreGoal = 5000;
+const playerTurnColor = '#222222';
+const cpuTurnColor = '#222222';
 const playerDieColor = 'black';
 const cpuDieColor = 'red';
 const bustedColor = '#c4002e';
-
-// Dev tools
-const useRiggedDice = false;
-const riggedDice = [2, 2, 3, 3, 6, 6];
 
 // Start game
 initialize();
@@ -206,27 +204,6 @@ function moveDie(div) {
 	}
 }
 
-function initialize() {
-	gameOver = false;
-	roundTotal = 0;
-	playerScore = 0;
-	cpuScore = 0;
-	busted = false;
-	dice = [];
-	diceInPlay = [];
-	diceInHeld = [];
-	scoringGroupsInPlay = [];
-	consoleLines = [];
-	labelNameCpu.classList.remove('turn-indicator');
-	labelNamePlayer.classList.add('turn-indicator');
-	document.body.style.background = playerTurnColor;
-	disable(messageText);
-	resetBoard();
-	updateUI();
-	enable(buttonRoll);
-	startPlayerTurn();
-}
-
 function updateUI() {
 	// grand totals
 	scoreText.innerText = playerScore;
@@ -237,8 +214,14 @@ function updateUI() {
 	buttonRoll.innerText = `Throw ${6 - diceInHeld.length}`;
 
 	// scorebar fills
-	const playerFill = (playerScore / scoreGoal) * 100;
-	const cpuFill = (cpuScore / scoreGoal) * 100;
+	let playerFill = (playerScore / scoreGoal) * 100;
+	let cpuFill = (cpuScore / scoreGoal) * 100;
+	if (playerFill > 100) {
+		playerFill = 100;
+	}
+	if (cpuFill > 100) {
+		cpuFill = 100;
+	}
 	playerScoreBar.style.width = `${playerFill}%`;
 	cpuScoreBar.style.width = `${cpuFill}%`;
 }
@@ -351,8 +334,11 @@ function disable(element) {
 }
 
 // HTML for dice faces
-const html_dice1 = '<span class="dot"></span>';
-const html_dice2 = '<span class="dot"></span>' + '<span class="dot"></span>';
+const html_dice1 = 
+'<span class="dot"></span>';
+const html_dice2 = 
+'<span class="dot"></span>' + 
+'<span class="dot"></span>';
 const html_dice3 =
 	'<span class="dot"></span>' +
 	'<span class="dot"></span>' +
@@ -407,6 +393,6 @@ function sound(src) {
 	};
 }
 
-snd_tic1 = new sound('tic-1.wav');
-snd_tic2 = new sound('tic-2.wav');
-snd_bloop1 = new sound('bloop-1.wav');
+snd_tic1 = new sound('audio/tic-1.wav');
+snd_tic2 = new sound('audio/tic-2.wav');
+snd_bloop1 = new sound('audio/bloop-1.wav');

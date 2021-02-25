@@ -1,17 +1,36 @@
-// Handles game flow and controls states
+// GAME.JS handles game flow and states
+
+function initialize() {
+	labelNameCpu.classList.remove('turn-indicator');
+	labelNamePlayer.classList.add('turn-indicator');
+
+	gameOver = false;
+	roundTotal = 0;
+	playerScore = 0;
+	cpuScore = 0;
+	busted = false;
+	dice = [];
+	diceInPlay = [];
+	diceInHeld = [];
+	scoringGroupsInPlay = [];
+	consoleLines = [];
+
+	text.clear();
+	disable(messageText);
+	resetBoard();
+	updateUI();
+	enable(buttonRoll);
+	startPlayerTurn();
+}
+
 // Create and 'throw' num dice
 function throwDice(num) {
 	dice.length = 0;
 	let rolledMessage = `Rolled `;
 	// Create num dice in play area
-	text.write(`Throwing ${num} dice`, 'blue');
+	text.write(`Throwing ${num} dice`, 'white');
 	for (let i = 0; i < num; i++) {
 		const newDie = new Die();
-
-		// Dev tools: Manually set the dice value for testing
-		if (useRiggedDice) {
-			newDie.faceValue = riggedDice[i];
-		}
 
 		// Create dots on the die depending on what the face value is
 		switch (newDie.faceValue) {
@@ -51,22 +70,24 @@ function throwDice(num) {
 		});
 	}
 
-	text.write(rolledMessage, 'cyan');
+	text.write(rolledMessage, 'white-bold');
 }
 
 function startPlayerTurn() {
+	disable(messageText);
 	busted = false;
 	playersTurn = true;
-	text.write("== Start of Player's turn", 'bg-green');
+	text.write("Start of Player's turn", 'black');
 	document.body.style.background = playerTurnColor;
 	buttonRoll.style.color = 'white';
 	buttonRoll.style.border = '4px solid white';
 }
 
 function startCPUTurn() {
+	disable(messageText);
 	busted = false;
 	playersTurn = false;
-	text.write("== Start of CPU's turn", 'bg-red');
+	text.write("Start of CPU's turn", 'black');
 	disable(buttonRoll);
 	disable(buttonStand);
 	setTimeout(cpuTurn, 1000);
@@ -134,7 +155,7 @@ function moveScoringGroups() {
 
 function endTurn() {
 	resetBoard();
-
+	
 	if (playersTurn) {
 		// End Player turn
 		labelNameCpu.classList.add('turn-indicator');
@@ -170,29 +191,63 @@ function endTurn() {
 		}
 	}
 
-	disable(messageText);
 	updateUI();
 }
 
 function checkForWin() {
 	// Player wins
 	if (playerScore >= scoreGoal) {
-		disable(buttonRoll);
-		text.write(`You have reached ${scoreGoal} points.`, 'green');
-		text.write('YOU WIN!', 'bg-green');
-		messageText.innerText = `You reached ${scoreGoal} points. YOU WIN!`;
-		messageText.style.color = 'white';
 		enable(messageText);
+		messageText.innerText = `You reached ${scoreGoal} points. YOU WIN!`;
+   		messageText.style.color = 'white';
+		text.write(`You have reached ${scoreGoal} points.`, 'chartreuse');
+		text.write('YOU WIN!', 'bg-green');
 		gameOver = true;
+
 	}
 	// Cpu wins
 	else if (cpuScore >= scoreGoal) {
+		enable(messageText);
+		messageText.innerText = `CPU reached ${scoreGoal} points. You Lose.`;
+		messageText.style.color = 'red';
+
 		disable(buttonRoll);
 		text.write(`CPU has reached ${scoreGoal} points.`, 'red');
 		text.write('YOU LOSE.', 'bg-red');
-		messageText.innerText = `CPU reached ${scoreGoal} points. You Lose.`;
-		messageText.style.color = 'red';
-		enable(messageText);
 		gameOver = true;
+
 	}
+}
+
+
+function bustCheck() {
+	// Either enter bust state if no scoring dice rolled, or select scoring dice
+	if (anyScoring(diceInPlay)) {
+		busted = false;
+		if (!playersTurn) {
+			setTimeout(moveScoringGroups, 1200);
+		}
+	} else {
+		setTimeout(handleBust, 750);
+	}
+}
+
+// Handle 'Bust' and 'End Turn' states for player and cpu
+function handleBust() {
+	busted = true;
+	roundTotal = 0;
+	document.body.style.background = bustedColor;
+	disable(buttonStand);
+	snd_bloop1.play();
+
+	if (playersTurn) {
+		enable(messageText);
+		messageText.innerText = 'Busted!  No scoring dice rolled.';
+   		messageText.style.color = 'white';
+		text.write('Busted! No scoring dice rolled.', 'black');
+	} else {
+		text.write('CPU Busted! No scoring dice rolled.', 'black');
+	}
+
+	setTimeout(endTurn, 2500);
 }
