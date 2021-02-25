@@ -11,8 +11,50 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
 
+
+
+    <style>
+        /* Tooltip container */
+        .tooltip {
+            /* display: block;
+            position: absolute;
+            top: 300px;
+            left: 300px;
+            width: 500px;
+            height: 350px;
+            background: red;
+            z-index: 5; */
+        }
+        
+        /* Tooltip text */
+        .tooltip .tooltiptext {
+          visibility: hidden;
+          width: 120px;
+          /* background-color: white; */
+          color: chartreuse;
+          text-align: center;
+          padding: 5px 0;
+          border-radius: 6px;
+         
+          /* Position the tooltip text - see examples below! */
+          position: absolute;
+          z-index: 5;
+        }
+        
+        /* Show the tooltip text when you mouse over the tooltip container */
+        .tooltip:hover .tooltiptext {
+          visibility: visible;
+        }
+        </style>
+
+
+
+
 </head>
 <body>
+
+
+
 
     <div class="grid-container">
         <p id="message"></p> 
@@ -39,11 +81,16 @@
         <div class="console">
             <div id="console-container"></div>
         </div>
-        <div class="rollButton">
-            <a href="" class="button" id="button-roll"></a>
+        <div class="rollButton tooltip">
+            <a href="" class="button tooltip" id="button-roll">
+                <span class="tooltiptext">Tooltip text</span>
+            </a>
+            
         </div>
         <div class="playArea">
             <div id="play-area">
+
+                
             </div>
       </div>
     </div>
