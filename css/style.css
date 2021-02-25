@@ -21,7 +21,7 @@ html, body {
             user-select: none; /* Non-prefixed version, currently
                                   supported by Chrome, Edge, Opera and Firefox */
 
-    /* these are set via script for random dice positioning                              */
+    /* these are set via script for random dice positioning             */
     --random-point-x: 0px;
     --random-point-y: 0px;
     --random-rotation: 0deg;
@@ -68,8 +68,6 @@ p {
 
 /* Dice  */
 .die {
-    /* display: flex;
-    flex-direction: row; */
     height: 50px;
     width: 50px; 
     border: solid 1px black;
