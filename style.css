@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400&display=swap');
 * {
     box-sizing: border-box;
 }
@@ -6,7 +7,7 @@
 html, body {
     background: #333333; 
     color: antiquewhite;
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: 'Open Sans', sans-serif;
     font-size: 16px;
 
     /* https://stackoverflow.com/questions/826782/how-to-disable-text-selection-highlighting */
@@ -18,11 +19,20 @@ html, body {
         -ms-user-select: none; /* Internet Explorer/Edge */
             user-select: none; /* Non-prefixed version, currently
                                   supported by Chrome, Edge, Opera and Firefox */
+
+    /* these are set via script for random dice positioning                              */
+    --random-point-x: 0px;
+    --random-point-y: 0px;
+    --random-rotation: 0deg;
+
+    --throw-origin-x: 800px;
+    --throw-origin-y: 50px;
+    --throw-animation-time: 1s;
 }
 
 h1 {
     font-size: 24px;
-    pointer-events: none;;
+    pointer-events: none;
 }
 
 a {
@@ -33,109 +43,57 @@ p {
     pointer-events: none;
 }
 
-/* Dice Areas */
 .area {
-    /* display: flex; */
     border: 1px cyan solid;
     margin: 25px;
 }
 
-.flex-container {
-    display: flex;
-    flex-wrap: wrap;
-}
-
-.flex-row {
-    flex-direction: row;
-    flex-wrap: wrap;
-}
-
-.flex-column {
-    flex-direction: column;
-    flex-wrap: wrap;
-}
-
-.flex-child {
-    flex: 1;
-    height: auto;
-}
-
-/* .flex-child:before {
-    content: '';
-    display: block;
-    padding-top: 100%;
-} */
-
 #play-area {
     width:100%;
     height:100%;
-    /* background: black; */
-    /* display: flex; */
-    /* flex-direction: row; */
-    /* flex-wrap: wrap; */
 }
-
 
 #held-area {
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;
-    justify-content: space-between;
-    background: rgba(0,0,0,0.7);
+    background: rgba(0,0,0,0.3);
     width: 15vw;
     min-width: 200px;
     height:100%;
-    max-height: 300px;
+    max-height: 250px;
     padding: 20px;
-    border: orange 1px solid;
 }
 
-.absolute {
-    position: absolute;
-}
-
-
-/* Dice DIVS */
+/* Dice  */
 .die {
-    background: transparent;
-    display: flex;
     height: 50px;
     width: 50px; 
-    border: solid 1px gray;
+    border: solid 1px black;
     margin: 10px;
     padding: 5px;
     border-radius: 10%;
-    z-index: 1;
-    transition: transform 1s ease-out;
     transition: border 0.08s linear;
-
 }
 
-/* .die .face-value {
-    color: white;
-    font-size: 30px;
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    pointer-events: none;
-    
-} */
+.die-animation {
+    animation: throw var(--throw-animation-time);
+    animation-fill-mode: forwards;
+}
 
-.die .point-value {
-    color: white;
-    font-size: 16px;
-    font-style: italic;
-    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-    pointer-events: none;
-    
+@keyframes throw {
+    0% {
+        transform: translateX(var(--throw-origin-x)) translateY(var(--throw-origin-y)) rotate(0deg); 
+    }
+  
+    100% {
+        transform: translateX(var(--random-point-x)) translateY(var(--random-point-y)) rotate(var(--random-rotation)); 
+    }
 }
 
 .die:active {
-    /* background-color: white; */
     border: 1px red solid;
 }
-
-/* .die:hover {
-    border: red solid 1px;
-} */
 
 .scoring {
     cursor: grab; 
@@ -148,21 +106,17 @@ p {
 
 .scoring:hover {
     border: 4px solid white;
-    transform: rotate(1080deg);
 }
 
 .scoring-solo {
-    /* background: blue; */
     border: 4px solid blue;
 }
 
 .scoring-group {
-    /* background: orange; */
     border: 4px solid orange;
 }
 
 .scoring-straight {
-    /* background: purple; */
     border: 4px solid purple;
 }
 
@@ -170,9 +124,13 @@ p {
     pointer-events: none;
 }
 
+.absolute {
+    position: absolute;
+}
+
 
 /* CSS Dice w/ Dots */
-/* taken from */
+/* below taken from */
  /* https://betterprogramming.pub/creating-dice-in-flexbox-in-css-a02a5d85e516 */
 .dot {
     display: block;
@@ -180,7 +138,7 @@ p {
     height: 10px;
     border-radius: 50%;
     background-color:white;
-    /* pointer-events: none; */
+    pointer-events: none;
 }
 
 .first-face {
@@ -188,15 +146,6 @@ p {
     justify-content: center;
     align-items: center;
   }
-/* 
-  .dice {
-    padding: 4px;
-    background-color: tomato;
-    width: 104px;
-    height: 104px;
-    border-radius: 10%;
-    margin-right : 10px;
-  } */
 
 .second-face {
     display: flex;
@@ -234,73 +183,46 @@ p {
 .fifth-face .column:nth-of-type(2) {
     justify-content: center;
 }
+/* above taken from */
 /* https://betterprogramming.pub/creating-dice-in-flexbox-in-css-a02a5d85e516 */
-
-
-
-
-.translucent {
-    filter: blur(10px);
-    opacity: 0.35;
-}
 
 
 /* Scoreboard */
 .score {
     float: right;
     text-align: right;
-}
 
-#score-player {
-    color: chartreuse;
     margin: auto 20px;
-
 }
 
 .label-name {
     display: inline;
-    padding-left: 5px;
-}
-
-#label-name-player {
-
-}
-
-#score-cpu {
-    color:red;
-    margin: auto 20px;
-}
-
-#label-name-cpu {
-
+    padding: 0px 5px;
 }
 
 .turn-indicator {
     border-left: 5px solid white;
-    /* border-top: 1px solid chartreuse; */
-    background-color: black;
+    border-right: 5px solid white;
 }
 
 .scorebar {
     display: block;
-    /* flex: 1; */
     width: 100%;
     height: 5px;
     border: 1px gray solid;
     margin: 4px 0;
-
 }
 
 #scorebar-fill-player {
     background: chartreuse;
-    width: 40%;
+    width: 0%;
     height: 100%;
     transition: width 0.5s;
 }
 
 #scorebar-fill-cpu {
     background: red;
-    width: 40%;
+    width: 0%;
     height: 100%;
     transition: width 0.5s;
 }
@@ -309,37 +231,30 @@ p {
     font-size:36px;
 }
 
-#label-round {
-    /* display:block;
-    position: absolute;
-    bottom: 75px;
-    left: 250px; */
-}
-
 #message {
-    display: block;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     position: absolute;
-    top:40%;
+    top:35%;
     left:0%;
-    color:white;
-    font-size: 24px;
+    color:antiquewhite;
+    background: rgba(0,0,0,0.5);
+    font-size: 30px;
     text-align: center;
     width: 100%;
+    height: 60px;
+    z-index: 1;
 }
-
-
 
 /* Buttons  */
 a.button {
     display: flex;
     align-items: center;
     justify-content: center;
-    /* position: absolute; */
-    border: 3px orange solid;
     font-size: 20px;
     text-decoration: none;
-    color: orange;
-    cursor: default;
+    cursor: pointer;
     text-transform: uppercase;
 
 }
@@ -361,53 +276,43 @@ a.button:active {
     font-size: auto;
     font-weight: bold;
     color: chartreuse;
+    border: 4px solid chartreuse;
+
 }
 
-#button-roll {
+#button-stand:hover {
+    border:4px white solid;
+    cursor: pointer;
+}
 
+
+#button-roll {
     bottom: 0px;
     width: 200px;
     height: 200px;
     font-size: 30px;
     border-radius: 50%;
+    border: 4px red solid;
 }
 
-#button-roll:hover {
-    border:8px white solid;
-    cursor: pointer;
-    background: rgba(255,255,255, 0.35);
-    /* filter: blur(2px);
-    opacity: 0.35; */
+a.button:hover {
+    border: white 4px solid;
 }
+
+/* #button-roll:hover {
+    border: 8px red solid;
+    cursor: pointer;
+    background-color: blue;
+} */
 
 .disabled {
     visibility: hidden;
-    /* color: gray;
-    background: gray;
-    pointer-events: none;
-    border: gray dashed 1px; */
 }
-
-/* Drag & Drop */
-.snap-target { 
-    width: 90px; 
-    height: 90px; 
-    border: solid 1px blue; 
-}
-
-/* #drag-containment-wrapper {} */
-.hover { border: 5px dashed magenta; background: chartreuse;}
-
-.droppable {
-    border: solid 2px yellow;
-}
-
-/* .droppable:hover,.droppable.hover{
- background-color: rgba(255, 0, 119, 1); */
 
 /* Console colors and styling */
 .red {
     color: red;
+    background: black;
 }
 
 .red-bold {
@@ -449,8 +354,7 @@ a.button:active {
     padding: 10px;
     margin-top:10px;
     overflow-y: scroll;
-    border-top: 4px solid gray;
-    background: rgba(0,0,0,0.7);
+    opacity: 1;
 }
 
 #console-container::-webkit-scrollbar {
@@ -462,12 +366,6 @@ a.button:active {
     width: 100%;
     margin:2px;
     font-size: 14px;
-
-
-}
-
-.border-cyan {
-    border: 1px solid cyan;
 }
 
 

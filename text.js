@@ -1,5 +1,5 @@
 //#region [Purple]
-// Handles text styling and output
+// Handles text styling and output to the 'console'
 class Text {
 
 	constructor() {}
@@ -73,10 +73,6 @@ class Text {
 				newLine.classList.add('white');
 				newLine.classList.add('bold');
 				break;
-		}
-
-		if (printToConsole) {
-			console.log('%c ' + msg, css);
 		}
 
 		consoleContainer.scrollTop = consoleContainer.scrollHeight;

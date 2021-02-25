@@ -1,7 +1,4 @@
-//#region [Violet]
-// class Game {
-// 	constructor() {}
-
+// Handles game flow and controls states
 // Create and 'throw' num dice
 function throwDice(num) {
 	dice.length = 0;
@@ -11,75 +8,73 @@ function throwDice(num) {
 	for (let i = 0; i < num; i++) {
 		const newDie = new Die();
 
-        // it it's the cpu's turn, add a class to each die that prevents mouse pointer events
-        if (!playersTurn) {
-            newDie.div.classList.add('no-click');
-        }
-
-		// Manually set the dice value for testing
+		// Dev tools: Manually set the dice value for testing
 		if (useRiggedDice) {
 			newDie.faceValue = riggedDice[i];
 		}
 
-		rolledMessage += newDie.faceValue.toString() + ' ';
+		// Create dots on the die depending on what the face value is
+		switch (newDie.faceValue) {
+			case 1:
+				newDie.div.classList.add('first-face');
+				newDie.div.innerHTML = html_dice1;
+				break;
+			case 2:
+				newDie.div.classList.add('second-face');
+				newDie.div.innerHTML = html_dice2;
+				break;
+			case 3:
+				newDie.div.classList.add('third-face');
+				newDie.div.innerHTML = html_dice3;
+				break;
+			case 4:
+				newDie.div.classList.add('fourth-face');
+				newDie.div.innerHTML = html_dice4;
+				break;
+			case 5:
+				newDie.div.classList.add('fifth-face');
+				newDie.div.innerHTML = html_dice5;
+				break;
+			case 6:
+				newDie.div.classList.add('sixth-face');
+				newDie.div.innerHTML = html_dice6;
+				break;
+		}
 
+		rolledMessage += newDie.faceValue.toString() + ' ';
 		dice.push(newDie);
 		diceInPlay.push(newDie);
 		playArea.appendChild(newDie.div);
+
+		newDie.div.addEventListener('animationend', () => {
+			newDie.div.classList.remove('no-click');
+		});
 	}
 
 	text.write(rolledMessage, 'cyan');
 }
 
 function startPlayerTurn() {
-	document.body.style.background = playerTurnColor;
-    busted = false;
+	busted = false;
 	playersTurn = true;
 	text.write("== Start of Player's turn", 'bg-green');
+	document.body.style.background = playerTurnColor;
+	buttonRoll.style.color = 'white';
+	buttonRoll.style.border = '4px solid white';
 }
 
 function startCPUTurn() {
-	document.body.style.background = cpuTurnColor;
-    busted = false;
-    playersTurn = false;
+	busted = false;
+	playersTurn = false;
 	text.write("== Start of CPU's turn", 'bg-red');
 	disable(buttonRoll);
 	disable(buttonStand);
-	setTimeout(cpuTurn, gameSpeed);
-	console.log('1 - startCpuTurn');
+	setTimeout(cpuTurn, 1000);
+	document.body.style.background = cpuTurnColor;
 }
 
-// Control cpu's turn
+// Control Cpu's turn
 function cpuTurn() {
-
-	const remainingDice = diceInPlay.length;
-	clearPlayArea();
-
-	// First turn throw 6 dice, otherwise throw remaining dice
-	if (diceInHeld.length === 0) {
-        throwDice(6);
-	} else {
-        throwDice(remainingDice);
-	}
-
-    checkScoring();
-    if (busted) {
-        roundTotal = 0;
-        setTimeout(endTurn, gameSpeed);
-        return;
-    }
-	updateUI();
-
-    setTimeout(moveScoringGroups, gameSpeed);
-
-}
-
-// Called on PLAYER turns from the roll button
-function handleDiceThrow() {
-
-	disable(buttonRoll);
-    disable(buttonStand);
-
 	const remainingDice = diceInPlay.length;
 	clearPlayArea();
 
@@ -90,25 +85,33 @@ function handleDiceThrow() {
 		throwDice(remainingDice);
 	}
 
-	checkScoring();
-	updateUI();
+	setTimeout(checkScoring, 1200);
+}
 
-    if (busted) {
-		enable(buttonRoll);
-        buttonRoll.innerText = "END TURN";
-		enable(messageText);
-		messageText.innerText = 'Busted!  No scoring dice rolled.'
-		messageText.style.color = 'black';
-    }
+// Called on PLAYER turns from the roll button
+function handleDiceThrow() {
+	snd_tic2.play();
+
+	disable(buttonRoll);
+	disable(buttonStand);
+
+	const remainingDice = diceInPlay.length;
+	clearPlayArea();
+
+	// First turn throw 6 dice, otherwise throw remaining dice
+	if (diceInHeld.length === 0) {
+		throwDice(6);
+	} else {
+		throwDice(remainingDice);
+	}
+	setTimeout(checkScoring, 1500);
 }
 
 // Called on CPU turn
 // Method for the cpu to move all scoring dice over to the held area
 function moveScoringGroups() {
-	console.log(`MovingScoringGroups: ${scoringGroupsInPlay.length}`);
 	scoringGroupsInPlay.forEach((scoringGroup) => {
 		if (scoringGroup.type === 'Single') {
-			console.log('CPU picks a single');
 			roundTotal += scoringGroup.value;
 			moveDie(scoringGroup.members[0].div);
 		} else {
@@ -116,28 +119,24 @@ function moveScoringGroups() {
 				moveDie(die.div);
 			});
 			roundTotal += scoringGroup.value;
-			console.log(`CPU picks a group: ${scoringGroup.type}`);
 		}
 	});
 
 	// "Decide" for the CPU when to stop rolling the dice and end the turn
-	// Chooses from a pool of three possibilities with three weighted values 
 	const rollThreshold = randomWeighted(1, 2, 3, 15, 85);
-	console.log(`rollThreshold: ${rollThreshold}`)
 
-    if (diceInPlay.length > rollThreshold) {
-        setTimeout(cpuTurn, gameSpeed);
-
+	if (diceInPlay.length > rollThreshold) {
+		setTimeout(cpuTurn, 1000);
 	} else {
-        setTimeout(endTurn, gameSpeed);
+		setTimeout(endTurn, 1000);
 	}
 }
 
 function endTurn() {
 	resetBoard();
-	disable(messageText);
 
 	if (playersTurn) {
+		// End Player turn
 		labelNameCpu.classList.add('turn-indicator');
 		labelNamePlayer.classList.remove('turn-indicator');
 		document.body.style.background = cpuTurnColor;
@@ -149,43 +148,33 @@ function endTurn() {
 		roundTotal = 0;
 		checkForWin();
 		if (gameOver) {
-			//do gameover message, effects, etc
 			setTimeout(initialize, 5000);
-		}
-		else {
+		} else {
 			startCPUTurn();
 		}
 	} else {
+		// End CPU turn
 		labelNameCpu.classList.remove('turn-indicator');
 		labelNamePlayer.classList.add('turn-indicator');
 		document.body.style.background = playerTurnColor;
-		//heldArea.style.background = 'black';
 		cpuScore += roundTotal;
 		text.write(`CPU ended their turn.`, 'red');
 		text.write(`Earned ${roundTotal} points.`, 'red');
 		enable(buttonRoll);
-		// disable(buttonStand);
 		roundTotal = 0;
 		checkForWin();
 		if (gameOver) {
-			//do gameover message, effects, etc
 			setTimeout(initialize, 5000);
-		}
-		else {
+		} else {
 			startPlayerTurn();
 		}
 	}
 
+	disable(messageText);
 	updateUI();
 }
 
-// If player 'busts' and doesn't roll any scoring die, enter this state
-// function bust() {
-
-// }
-
 function checkForWin() {
-
 	// Player wins
 	if (playerScore >= scoreGoal) {
 		disable(buttonRoll);
@@ -195,9 +184,8 @@ function checkForWin() {
 		messageText.style.color = 'white';
 		enable(messageText);
 		gameOver = true;
-
 	}
-	// cpu wins
+	// Cpu wins
 	else if (cpuScore >= scoreGoal) {
 		disable(buttonRoll);
 		text.write(`CPU has reached ${scoreGoal} points.`, 'red');
@@ -207,79 +195,4 @@ function checkForWin() {
 		enable(messageText);
 		gameOver = true;
 	}
-
 }
-
-// }
-//#endregion
-
-
-
-// HTML for dice faces
-const html_dice1 = '<span class="dot"></span>';
-const html_dice2 = '<span class="dot"></span>' + '<span class="dot"></span>';
-const html_dice3 =
-	'<span class="dot"></span>' +
-	'<span class="dot"></span>' +
-	'<span class="dot"></span>';
-const html_dice4 =
-	'<div class="column">' +
-	'<span class="dot"></span>' +
-	'<span class="dot"></span>' +
-	'</div>' +
-	'<div class="column">' +
-	'<span class="dot"></span>' +
-	'<span class="dot"></span>' +
-	'</div>';
-const html_dice5 =
-	'<div class="column">' +
-	'<span class="dot"></span>' +
-	'<span class="dot"></span>' +
-	'</div>' +
-	'<div class="column">' +
-	'<span class="dot"></span>' +
-	'</div>' +
-	'<div class="column">' +
-	'<span class="dot"></span>' +
-	'<span class="dot"></span>' +
-	'</div>';
-const html_dice6 =
-	'<div class="column">' +
-	'<span class="dot"></span>' +
-	'<span class="dot"></span>' +
-	'<span class="dot"></span>' +
-	'</div>' +
-	'<div class="column">' +
-	'<span class="dot"></span>' +
-	'<span class="dot"></span>' +
-	'<span class="dot"></span>' +
-	'</div>';
-
-
-
-
-	// AUDIO
-	// https://www.w3schools.com/graphics/game_sound.asp
-	function sound(src) {
-		this.sound = document.createElement("audio");
-		this.sound.src = src;
-		this.sound.setAttribute("preload", "auto");
-		this.sound.setAttribute("controls", "none");
-		this.sound.style.display = "none";
-		document.body.appendChild(this.sound);
-		this.play = function(){
-		  this.sound.play();
-		}
-		this.stop = function(){
-		  this.sound.pause();
-		}
-	  }
-
-
-
-
-	  snd_tic1 = new sound("tic-1.wav");
-	  snd_tic2 = new sound("tic-2.wav");
-	  snd_menuChange1 = new sound("menu-change-1.wav");
-	  	  snd_menuChange2 = new sound("menu-change-2.wav");
-	  snd_bloop1 = new sound("bloop-1.wav");
