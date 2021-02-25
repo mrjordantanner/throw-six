@@ -1,10 +1,11 @@
-# 'Throw 6'
+# 'Throw Six' :game_die:
 ### a Dice Game by Jordan T Smith
 
-In 'Throw 6', six dice are thrown and the player and computer alternate turns. Points are gained for every 1 or 5 thrown, for three or more of a kind, and for straights. The first player to earn 5000 points is the winner.
+In 'Throw Six', six dice are thrown and the player and computer alternate turns. Points are gained for every 1 or 5 thrown, for three or more of a kind, and for straights. The first player to earn 5000 points is the winner.
 
 ![Screen Shot 2021-02-25 at 8 31 51 AM](https://user-images.githubusercontent.com/50030252/109171255-37f33080-7747-11eb-9d23-c5cdc7b00db0.png)
 
+### Play Here: https://mrjordantanner.github.io/throw-six/
 
 # How to Play :game_die:
 A player's turn always begins by throwing all six dice. The player then must set aside scoring dice, and at least one scoring die must always be set aside. Then the player can throw the remaining dice again and the situation repeats. Scoring combinations are counted only for the current throw.
@@ -26,19 +27,13 @@ Click the 'Throw 6' button to throw six dice.  If you rolled any scoring dice, t
 - Partial Straight 1-5 = 500 points
 - Partial Straight 2-6 = 750 points
 
-# Technologies Used :jigsaw:
-HTML | CSS | JavasScript
-
 # Under the Hood :gear:
-This game was built entirely from scratch for the General Assembly Software Engineering Immersive Unit 1 Project.
-One of the main challenges in designing the logic for this game was properly identifying the scoring dice in all situations and to be able to treat the dice as groups, not individual dice.
-
-After rolling, the game checks for any straights, three or more of a kind, or single 1's or 5's.  If it finds any, it assigns each group of dice to a 'Scoring Group' and gives it the appropriate point value.  Single scoring dice are given their own group and are treated the same way as a group.
+After creating and rolling the dice objects, the game checks for any straights, three or more of a kind, or single 1's or 5's.  If it finds any, it assigns each group of dice to a 'Scoring Group' and gives it the appropriate point value.  Single scoring dice are given their own group and are treated the same way as a group.
 
 As the player clicks dice groups to move them to the scoring area, their point values are added to the running total for the round until they decide to 'Stand' and collect, or keep rolling and bust. 
 
 ___
-# Development Screenshots
+# Screenshots & Wireframes
 
 ![dice-sketch-1](https://user-images.githubusercontent.com/50030252/109171458-6b35bf80-7747-11eb-98fd-f574a0528e62.jpeg)
 
@@ -53,14 +48,29 @@ ___
 ![Screen Shot 2021-02-25 at 8 30 20 AM](https://user-images.githubusercontent.com/50030252/109174638-a08fdc80-774a-11eb-93d3-95c04b08deaa.png)
 
 ---
-## Future Iterations
-If this project is expanded upon further, I plan to add better sound and music, a much more clean and robust UI system, multiplayer mode, and a gambling feature.
+## Technologies Used :jigsaw:
+HTML | CSS | JavasScript
 
+## Hurdles
+This game was built entirely from scratch for the General Assembly Software Engineering Immersive Unit 1 Project.
+One of the main challenges in designing the logic for this game was properly identifying the scoring dice in all situations and to be able to treat the dice as groups, not individual dice.  The randomized motion of the dice presented a challenge as well.
 
-## Credits
+## User Stories :raising_hand_woman:
+- As someone who enjoys tabletop games, I want to play a digital version of a  dice game that automatically keeps track of dice point values for me.
+- As a gambler, I want to enjoy the risk vs. reward that comes along with games of chance.
+
+## Planned Features :arrow_forward:
+If this project is expanded upon further, I plan to add:
+- Title screen and menu
+- Full sound effects and music
+- Custom color schemes and dice colors
+- All dice in scoring group are highlighted when one member of the group is hovered over
+- A more detailed tooltip appears on mouseover over certain key items to provide more information to the user.
+
+## Credits :white_check_mark:
 - This application was written entirely by me, Jordan Smith, unless otherwise cited in the code.
 
 - The game concept and rules come from a mini-game in the video game "Kingdom Come."
 
-## To Install
-Simply fork and clone this repository.
+## Installation Instructions
+- Simply fork and clone this repository.
